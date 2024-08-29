@@ -1,0 +1,87 @@
+import org.gradle.api.plugins.jvm.JvmTestSuite
+
+plugins {
+	id 'jvm-test-suite'
+}
+
+configurations {
+	testImplementation.extendsFrom compileOnly
+}
+
+testing {
+	suites {
+		configureEach {
+			dependencies {
+				implementation libs.log4j.slf4j
+
+				implementation tests.assertj
+				implementation tests.assertj.json
+				implementation tests.mockito.core
+			}
+		}
+
+		test {
+			useJUnitJupiter tests.jupiter.bom.get().version
+
+			dependencies {
+				implementation platform(tests.jupiter.bom)
+
+				implementation tests.mockito.jupiter
+			}
+		}
+
+		final def srcDir = file('src')
+
+		if( srcDir.exists() ) {
+			srcDir.eachDirMatch({ it =~ /^.+Test/ }) {
+				final def java = new File(it, 'java')
+
+				if( !java.exists() ) {
+					return
+				}
+
+				final def suite = it.name - 'Test'
+
+				create("${suite}Test", JvmTestSuite) {
+					dependencies {
+						implementation project()
+					}
+
+					targets {
+						all {
+							testTask.configure {
+								shouldRunAfter 'test'
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+tasks.withType Test, { task ->
+	doNotTrackState 'Always execute test tasks'
+
+	tasks.named('check') {
+		dependsOn task
+	}
+
+	testLogging {
+		showStandardStreams = true
+		showExceptions = true
+		showStackTraces = true
+		exceptionFormat = "full"
+	}
+
+	beforeTest { descriptor ->
+		logger.lifecycle("\n**** STARTING: ${descriptor.className}.${descriptor.name} - ${descriptor.displayName}")
+	}
+	afterTest { descriptor, result ->
+		logger.lifecycle("**** $result: ${descriptor.className}.${descriptor.name} - ${descriptor.displayName}\n")
+	}
+
+	enableAssertions = true
+	forkEvery = 1
+	ignoreFailures = System.env.CI == 'true'
+}

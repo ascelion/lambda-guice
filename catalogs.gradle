@@ -1,0 +1,64 @@
+dependencyResolutionManagement {
+	versionCatalogs {
+		build {
+			library('freefair-aspectj', 'io.freefair.aspectj.post-compile-weaving:io.freefair.aspectj.post-compile-weaving.gradle.plugin:8.6')
+			library('freefair-lombok', 'io.freefair.lombok:io.freefair.lombok.gradle.plugin:8.6')
+		}
+
+		libs {
+			library('aspectjrt', 'org.aspectj:aspectjrt:1.9.22')
+
+			library('aws-sdk-java1-bom', 'com.amazonaws:aws-java-sdk-bom:1.12.767')
+			library('aws-sdk-java2-bom', 'software.amazon.awssdk:bom:2.26.28')
+
+			library('aws-lambda-core', 'com.amazonaws:aws-lambda-java-core:1.2.3')
+			library('aws-lambda-events', 'com.amazonaws:aws-lambda-java-events:3.13.0')
+			library('aws-lambda-log4j', 'com.amazonaws:aws-lambda-java-log4j2:1.6.0')
+
+			library('classgraph', 'io.github.classgraph:classgraph:4.8.174')
+
+			library('commons-collections4', 'org.apache.commons:commons-collections4:4.4')
+			library('commons-io', 'commons-io:commons-io:2.7')
+			library('commons-lang3', 'org.apache.commons:commons-lang3:3.13.0')
+			library('commons-text', 'org.apache.commons:commons-text:1.11.0')
+
+			library('guice-bom', 'com.google.inject:guice-bom:7.0.0')
+			library('guice', 'com.google.inject', 'guice').withoutVersion()
+
+			library('jakarta-bom', 'jakarta.platform:jakarta.jakartaee-bom:10.0.0')
+			library('jakarta-annotation', 'jakarta.annotation', 'jakarta.annotation-api').withoutVersion()
+			library('jakarta-cdi', 'jakarta.enterprise', 'jakarta.enterprise.cdi-api').withoutVersion()
+			library('jakarta-inject', 'jakarta.inject', 'jakarta.inject-api').withoutVersion()
+
+			library('log4j-bom', 'org.apache.logging.log4j:log4j-bom:2.23.1')
+			library('log4j-api', 'org.apache.logging.log4j', 'log4j-api').withoutVersion()
+			library('log4j-core', 'org.apache.logging.log4j', 'log4j-core').withoutVersion()
+			library('log4j-slf4j', 'org.apache.logging.log4j', 'log4j-slf4j2-impl').withoutVersion()
+
+			library('lombok', 'org.projectlombok:lombok:1.18.34')
+
+			library('slf4j-bom', 'org.slf4j:slf4j-bom:2.0.12')
+			library('slf4j-api', 'org.slf4j', 'slf4j-api').withoutVersion()
+		}
+
+		tests {
+			library('assertj', 'org.assertj:assertj-core:3.25.3')
+			library('assertj-json', 'net.javacrumbs.json-unit:json-unit-assertj:3.2.7')
+
+			library('jupiter-bom', 'org.junit:junit-bom:5.10.3')
+			library('jupiter-api', 'org.junit.jupiter', 'junit-jupiter-api').withoutVersion()
+
+			version('mockito', '5.11.0')
+			library('mockito-core', 'org.mockito', 'mockito-core').versionRef('mockito')
+			library('mockito-jupiter', 'org.mockito', 'mockito-junit-jupiter').versionRef('mockito')
+			library('mockito-testng', 'org.mockito:mockito-testng:0.5.2')
+
+			version('system-stubs', '2.1.6')
+			library('system-stubs-core', 'uk.org.webcompere', 'system-stubs-core').versionRef('system-stubs')
+			library('system-stubs-jupiter', 'uk.org.webcompere', 'system-stubs-jupiter').versionRef('system-stubs')
+			library('system-stubs-testng', 'uk.org.webcompere', 'system-stubs-testng').versionRef('system-stubs')
+
+			library('testng', 'org.testng:testng:7.10.2')
+		}
+	}
+}

@@ -1,0 +1,6 @@
+apply from: 'catalogs.gradle'
+
+rootProject.name = 'lambda-guice'
+
+include 'bom'
+include 'boot'

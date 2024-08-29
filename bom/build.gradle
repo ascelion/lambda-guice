@@ -1,0 +1,25 @@
+plugins {
+	id 'build.conventions'
+	id 'build.constraints'
+
+	id 'java-platform'
+	id 'maven-publish'
+}
+
+javaPlatform {
+	allowDependencies()
+}
+
+dependencies {
+	constraints {
+		api project(':boot')
+	}
+}
+
+publishing {
+	publications {
+		'default' MavenPublication, {
+			from components.javaPlatform
+		}
+	}
+}

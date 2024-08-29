@@ -1,0 +1,11 @@
+plugins {
+	id 'java-test-fixtures'
+}
+
+plugins.withId 'eclipse', {
+	eclipse {
+		classpath {
+			containsTestFixtures = true
+		}
+	}
+}

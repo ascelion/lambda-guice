@@ -1,0 +1,15 @@
+
+configurations {
+	deps
+
+	all { cf ->
+		cf.hierarchy.contains(deps) || cf.extendsFrom(deps)
+	}
+}
+
+dependencies {
+	deps platform(libs.guice.bom)
+	deps platform(libs.jakarta.bom)
+	deps platform(libs.log4j.bom)
+	deps platform(libs.slf4j.bom)
+}

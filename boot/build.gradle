@@ -1,0 +1,48 @@
+plugins {
+	id 'build.java-library'
+	id 'build.java-test-fixtures'
+}
+
+dependencies {
+	api libs.guice
+	api libs.jakarta.annotation
+	api libs.jakarta.cdi
+	api libs.jakarta.inject
+	
+	implementation libs.classgraph
+	implementation libs.commons.lang3
+
+	testFixturesApi tests.mockito.core
+	testFixturesCompileOnly platform(tests.jupiter.bom)
+	testFixturesCompileOnly tests.jupiter.api
+	testFixturesCompileOnly tests.testng
+	testFixturesCompileOnly tests.system.stubs.jupiter
+	testFixturesCompileOnly tests.system.stubs.testng
+	testFixturesImplementation libs.commons.lang3
+}
+
+testing {
+	suites {
+		jupiterTest {
+			useJUnitJupiter tests.jupiter.bom.get().version
+		
+			dependencies {
+				implementation testFixtures(project())
+				implementation tests.mockito.jupiter
+				implementation tests.system.stubs.jupiter
+			}
+		}
+		
+		testngTest {
+			useTestNG tests.testng.get().version
+
+			dependencies {
+				implementation platform(tests.jupiter.bom)
+				implementation testFixtures(project())
+				implementation tests.jupiter.api
+				implementation tests.mockito.testng
+				implementation tests.system.stubs.testng
+			}
+		}
+	}
+}

@@ -1,0 +1,14 @@
+plugins {
+    id 'eclipse'
+    id 'groovy-gradle-plugin'
+}
+
+repositories {
+    gradlePluginPortal()
+}
+
+dependencies {
+	implementation build.freefair.lombok
+}
+
+eclipse.project.name = 'lambda-guice:build-src'

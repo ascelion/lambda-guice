@@ -1,0 +1,18 @@
+import org.gradle.api.publish.maven.MavenPublication
+
+plugins {
+	id 'build.java-commons'
+
+	id 'java-library'
+	id 'maven-publish'
+}
+
+publishing {
+	publications {
+		'default' MavenPublication, {
+			artifactId = "${rootProject.name}${project.path.replace(':', '-')}"
+
+			from components.java
+		}
+	}
+}

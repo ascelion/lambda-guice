@@ -1,0 +1,5 @@
+plugins {
+	id 'build.java-commons'
+
+    id 'application'
+}

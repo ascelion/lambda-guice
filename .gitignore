@@ -1,0 +1,27 @@
+.*
+!.git?*
+!.sdlc/
+
+*.iml
+*.zst
+*.xz
+*.gz
+*.zip
+*.jar
+*.tar
+*.tar.*
+*.war
+*.log
+
+bin/
+build/
+target/
+test-output/
+
+gradle-local.properties
+
+!gradle/wrapper/*.jar
+
+# JENKINS-52750
+*@tmp/
+

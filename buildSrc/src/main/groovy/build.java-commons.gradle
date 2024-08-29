@@ -1,0 +1,50 @@
+import org.gradle.api.tasks.compile.AbstractCompile
+import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.jvm.toolchain.JavaLanguageVersion
+
+plugins {
+	id 'java'
+
+	id 'build.conventions'
+	id 'build.constraints'
+
+	id 'build.java-tests'
+	id 'build.java-eclipse'
+
+	id 'io.freefair.lombok'
+}
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(javaVersion)
+	}
+	consistentResolution {
+		useCompileClasspathVersions()
+	}
+
+	withSourcesJar()
+}
+
+lombok {
+	version = libs.lombok.get().version
+}
+
+dependencies {
+	deps libs.slf4j.api
+}
+
+def compileAllTask = tasks.register('compileAll')
+
+tasks.withType AbstractCompile, { task ->
+	compileAllTask.configure {
+		dependsOn task
+	}
+}
+
+tasks.withType JavaCompile, {
+	options.compilerArgs << '-parameters'
+}
+
+repositories {
+	mavenCentral()
+}

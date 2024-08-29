@@ -1,0 +1,15 @@
+plugins {
+	id 'eclipse'
+	id 'lifecycle-base'
+}
+
+defaultTasks 'build'
+
+tasks.named 'clean', {
+	delete 'bin'
+}
+
+eclipse.project.natures 'org.eclipse.buildship.core.gradleprojectnature'
+eclipse.project.name = project.parent == null
+						? rootProject.name
+						: "${rootProject.name}:${project.path.substring(1).replace(':', '-')}"
