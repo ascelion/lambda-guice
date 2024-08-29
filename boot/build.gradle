@@ -3,35 +3,68 @@ plugins {
 	id 'build.java-test-fixtures'
 }
 
+sourceSets {
+	jupiter
+	testng
+}
+
+java {
+	registerFeature 'jupiter', {
+		usingSourceSet sourceSets.jupiter
+		withSourcesJar()
+	}
+	registerFeature 'testng', {
+		usingSourceSet sourceSets.testng
+		withSourcesJar()
+	}
+}
+
+configurations {
+	jupiterImplementation.extendsFrom testFixturesImplementation
+	testngImplementation.extendsFrom testFixturesImplementation
+
+	jupiterTestImplementation.extendsFrom jupiterImplementation
+	testngTestImplementation.extendsFrom testngImplementation
+}
+
 dependencies {
 	api libs.guice
 	api libs.jakarta.annotation
 	api libs.jakarta.cdi
 	api libs.jakarta.inject
-	
+
 	implementation libs.classgraph
 	implementation libs.commons.lang3
 
 	testFixturesApi tests.mockito.core
-
-	testFixturesCompileOnly platform(tests.jupiter.bom)
-	testFixturesCompileOnly tests.jupiter.api
-	testFixturesCompileOnly tests.testng
-
-	testFixturesImplementation tests.system.stubs.jupiter
-	testFixturesImplementation tests.system.stubs.testng
 	testFixturesImplementation libs.commons.lang3
+	testFixturesImplementation tests.system.stubs.core
+
+	jupiterApi platform(tests.jupiter.bom)
+	jupiterApi tests.jupiter.api
+	jupiterApi tests.mockito.jupiter
+	jupiterImplementation sourceSets.testFixtures.output
+	jupiterImplementation tests.system.stubs.jupiter
+
+	testngApi platform(tests.jupiter.bom)
+	testngApi tests.jupiter.api
+	testngApi tests.testng
+	testngApi tests.mockito.testng
+	testngImplementation sourceSets.testFixtures.output
+	testngImplementation tests.system.stubs.testng
 }
 
 testing {
 	suites {
 		jupiterTest {
 			useJUnitJupiter tests.jupiter.bom.get().version
-		
+
 			dependencies {
-				implementation testFixtures(project())
-				implementation tests.mockito.jupiter
-				implementation tests.system.stubs.jupiter
+				implementation project(), {
+					capabilities {
+						requireCapability("${project.group}:boot-jupiter")
+					}
+				}
 			}
 		}
 		
@@ -39,11 +72,11 @@ testing {
 			useTestNG tests.testng.get().version
 
 			dependencies {
-				implementation platform(tests.jupiter.bom)
-				implementation testFixtures(project())
-				implementation tests.jupiter.api
-				implementation tests.mockito.testng
-				implementation tests.system.stubs.testng
+				implementation project(), {
+					capabilities {
+						requireCapability("${project.group}:boot-testng")
+					}
+				}
 			}
 		}
 	}
