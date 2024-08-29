@@ -3,7 +3,6 @@ package com.ascelion.guice.module;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import com.google.inject.Injector;
 import com.google.inject.Singleton;
 
 import jakarta.annotation.PostConstruct;
@@ -87,13 +86,10 @@ class AutoBindModuleSingletonsTest extends AbstractAutoModuleTest {
 	static class Singleton4Provider implements Provider<Singleton4> {
 		int count;
 
-		@Inject
-		Injector injector;
-
 		@Override
 		@Singleton
 		public Singleton4 get() {
-			return injectMembers(this.injector, new Singleton4(this.count));
+			return new Singleton4(this.count);
 		}
 
 		@PostConstruct
@@ -124,13 +120,10 @@ class AutoBindModuleSingletonsTest extends AbstractAutoModuleTest {
 	static class Singleton5Producer {
 		int count;
 
-		@Inject
-		Injector injector;
-
 		@Produces
 		@Singleton
 		Singleton5 create(Singleton4 singleton4) {
-			return injectMembers(this.injector, new Singleton5(this.count, singleton4));
+			return new Singleton5(this.count, singleton4);
 		}
 
 		Singleton5 dontCreate() {

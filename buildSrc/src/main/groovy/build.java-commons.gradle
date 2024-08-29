@@ -5,7 +5,6 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 plugins {
 	id 'java'
 
-	id 'build.conventions'
 	id 'build.constraints'
 
 	id 'build.java-tests'

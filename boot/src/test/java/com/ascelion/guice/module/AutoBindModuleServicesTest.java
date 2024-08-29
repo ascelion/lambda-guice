@@ -84,12 +84,9 @@ class AutoBindModuleServicesTest extends AbstractAutoModuleTest {
 	static class Service4Provider implements Provider<Service4> {
 		int count;
 
-		@Inject
-		Injector injector;
-
 		@Override
 		public Service4 get() {
-			return injectMembers(this.injector, new Service4(this.count));
+			return new Service4(this.count);
 		}
 
 		@PostConstruct
@@ -120,12 +117,9 @@ class AutoBindModuleServicesTest extends AbstractAutoModuleTest {
 	static class Service5Producer {
 		int count;
 
-		@Inject
-		Injector injector;
-
 		@Produces
 		Service5 create(Service4 service4) {
-			return injectMembers(this.injector, new Service5(this.count, service4));
+			return new Service5(this.count, service4);
 		}
 
 		Service5 dontCreate() {

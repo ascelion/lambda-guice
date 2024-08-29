@@ -9,7 +9,11 @@ tasks.named 'clean', {
 	delete 'bin'
 }
 
+subprojects {
+	apply plugin: 'build.conventions'
+}
+
 eclipse.project.natures 'org.eclipse.buildship.core.gradleprojectnature'
-eclipse.project.name = project.parent == null
-						? rootProject.name
-						: "${rootProject.name}:${project.path.substring(1).replace(':', '-')}"
+eclipse.project.name = parent == null
+		? rootProject.name
+		: "${rootProject.name}:${project.path.substring(1).replace(':', '-')}"

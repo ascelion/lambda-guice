@@ -32,9 +32,18 @@ public class GuiceInit {
 	private final Set<String> packages = new HashSet<>();
 	private final List<Module> modules = new ArrayList<>();
 	private final List<Module> overrides = new ArrayList<>();
+	private final Set<String> excluded = new TreeSet<>();
 
 	GuiceInit() {
 		this.classes.add("@");
+	}
+
+	public GuiceInit exclude(Class<?>... classes) {
+		for (final var c : classes) {
+			this.excluded.add(c.getName());
+		}
+
+		return this;
 	}
 
 	public GuiceInit classes(Class<?>... classes) {
@@ -77,6 +86,7 @@ public class GuiceInit {
 
 	public ScanResult scan() {
 		return new ClassGraph()
+				.rejectClasses(this.excluded.toArray(String[]::new))
 				.acceptClasses(this.classes.toArray(String[]::new))
 				.acceptPackages(this.packages.toArray(String[]::new))
 				.enableAllInfo().scan();
@@ -108,7 +118,7 @@ public class GuiceInit {
 					.in(Scopes.SINGLETON);
 			bnd.bind(new StringSetLiteral())
 					.annotatedWith(new NamedLiteral("beanTypes"))
-					.toInstance(new HashSet<>());
+					.toInstance(new TreeSet<>());
 		};
 	}
 }

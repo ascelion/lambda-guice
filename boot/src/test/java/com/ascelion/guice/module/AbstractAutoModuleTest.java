@@ -1,6 +1,7 @@
 package com.ascelion.guice.module;
 
-import com.ascelion.guice.GuiceBoot;
+import static com.ascelion.guice.GuiceBoot.guiceInit;
+
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -9,7 +10,7 @@ import java.util.*;
 
 public abstract class AbstractAutoModuleTest {
 	Injector createInjector(boolean explicitBinding, boolean childInjector, boolean postConstruct) {
-		final var ini = GuiceBoot.init(getClass().getDeclaredClasses());
+		final var ini = guiceInit(getClass().getDeclaredClasses());
 
 		final Module strict = bnd -> {
 			if (explicitBinding) {
@@ -29,7 +30,7 @@ public abstract class AbstractAutoModuleTest {
 			all.add(injectMembers(inj0, new AutoBindBeansModule()));
 
 			if (postConstruct) {
-				all.add(new PostConstructModule());
+				all.add(injectMembers(inj0, new PostConstructModule()));
 			}
 
 			inj = inj0.createChildInjector(all);

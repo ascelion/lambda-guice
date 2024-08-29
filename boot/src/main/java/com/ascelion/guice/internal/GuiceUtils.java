@@ -1,4 +1,6 @@
-package com.ascelion.guice;
+package com.ascelion.guice.internal;
+
+import com.google.inject.BindingAnnotation;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -8,6 +10,7 @@ import java.util.stream.Stream;
 
 import io.github.classgraph.ClassInfo;
 import jakarta.enterprise.inject.Vetoed;
+import jakarta.inject.Qualifier;
 
 public final class GuiceUtils {
 	private static final Class<? extends Annotation>[] SINGLETONS = new Class[] {
@@ -29,7 +32,8 @@ public final class GuiceUtils {
 	}
 
 	public static boolean isVetoed(ClassInfo ci) {
-		return ci.hasAnnotation(Vetoed.class);
+		return ci.hasAnnotation(Vetoed.class)
+				|| ci.isInnerClass() && ci.getOuterClasses().stream().anyMatch(si -> si.hasAnnotation(Vetoed.class));
 	}
 
 	public static boolean isAnnotatedWith(AnnotatedElement annotated, Class<? extends Annotation>... types) {
@@ -42,5 +46,18 @@ public final class GuiceUtils {
 
 	public static boolean isSingleton(AnnotatedElement annotated) {
 		return isAnnotatedWith(annotated, jakarta.inject.Singleton.class, com.google.inject.Singleton.class);
+	}
+
+	public static Annotation getBindingAnnotation(AnnotatedElement annotated) {
+		for (final var a : annotated.getAnnotations()) {
+			if (a.annotationType().isAnnotationPresent(BindingAnnotation.class)) {
+				return a;
+			}
+			if (a.annotationType().isAnnotationPresent(Qualifier.class)) {
+				return a;
+			}
+		}
+
+		return null;
 	}
 }

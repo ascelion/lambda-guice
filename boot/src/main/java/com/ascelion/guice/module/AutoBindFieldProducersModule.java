@@ -1,10 +1,8 @@
 package com.ascelion.guice.module;
 
-import static com.ascelion.guice.GuiceUtils.isSingleton;
-import static java.lang.reflect.Modifier.isStatic;
-
 import com.ascelion.guice.GuiceScan;
-import com.google.inject.*;
+import com.ascelion.guice.internal.MemberProducer;
+import com.google.inject.AbstractModule;
 
 import java.lang.reflect.Field;
 import java.util.Set;
@@ -13,7 +11,6 @@ import io.github.classgraph.ScanResult;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import jakarta.inject.Provider;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,34 +40,11 @@ public class AutoBindFieldProducersModule extends AbstractModule {
 				final Field field = fi.loadClassAndGetField();
 				final Class target = field.getType();
 
-				if (isSingleton(target) || isSingleton(field)) {
-					LOG.debug("Binding singleton {} to provider {}.{}", target.getName(), ci.getName(), fi.getName());
-
-					bind(target).toProvider(readProducerField(source, field)).in(Scopes.SINGLETON);
-				} else {
-					LOG.debug("Binding {} to provider {}.{}", target.getName(), ci.getName(), fi.getName());
-
-					bind(target).toProvider(readProducerField(source, field));
-				}
+				new MemberProducer<>(getProvider(source), field, this::getProvider)
+						.bind(binder());
 
 				this.beanTypes.add(target.getName());
 			}
 		}
-	}
-
-	private Provider<?> readProducerField(Class<?> sourceType, Field field) {
-		final Provider sourceP = isStatic(field.getModifiers())
-				? () -> null
-				: getProvider(sourceType);
-
-		return () -> {
-			field.setAccessible(true);
-
-			try {
-				return field.get(sourceP.get());
-			} catch (IllegalArgumentException | IllegalAccessException e) {
-				throw new ProvisionException("Cannot read producer field", e);
-			}
-		};
 	}
 }

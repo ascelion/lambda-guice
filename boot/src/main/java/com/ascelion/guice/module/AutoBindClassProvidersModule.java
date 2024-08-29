@@ -1,10 +1,8 @@
 package com.ascelion.guice.module;
 
-import static com.ascelion.guice.GuiceUtils.isSingleton;
-
 import com.ascelion.guice.GuiceScan;
+import com.ascelion.guice.internal.MemberProducer;
 import com.google.inject.AbstractModule;
-import com.google.inject.Scopes;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -50,15 +48,8 @@ public class AutoBindClassProvidersModule extends AbstractModule {
 				throw new CreationException("Cannot find provider method", e);
 			}
 
-			if (isSingleton(target) || isSingleton(method)) {
-				LOG.debug("Binding singleton {} to provider {}", target.getName(), source.getName());
-
-				bind(target).toProvider(source).in(Scopes.SINGLETON);
-			} else {
-				LOG.debug("Binding {} to provider {}", target.getName(), source.getName());
-
-				bind(target).toProvider(source);
-			}
+			new MemberProducer<>(getProvider(source), method, this::getProvider)
+					.bind(binder());
 
 			this.beanTypes.add(target.getName());
 		}

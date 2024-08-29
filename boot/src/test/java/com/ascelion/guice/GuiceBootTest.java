@@ -1,5 +1,7 @@
 package com.ascelion.guice;
 
+import static com.ascelion.guice.GuiceBoot.guiceBoot;
+import static com.ascelion.guice.GuiceBoot.guiceInit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -17,21 +19,21 @@ class GuiceBootTest {
 	@Test
 	void run() {
 		assertAll(
-				() -> assertThat(GuiceBoot.boot(App.class))
+				() -> assertThat(guiceBoot(App.class))
 						.isInstanceOf(App.class),
-				() -> assertThat(GuiceBoot.init(getClass()).classes(getClass().getDeclaredClasses()).boot(App.class))
+				() -> assertThat(guiceInit(getClass()).classes(getClass().getDeclaredClasses()).boot(App.class))
 						.isInstanceOf(App.class),
-				() -> assertThat(GuiceBoot.init(getClass()).boot())
+				() -> assertThat(guiceInit(getClass()).boot())
 						.isInstanceOf(Injector.class),
 
 				() -> assertThatExceptionOfType(IllegalArgumentException.class)
-						.isThrownBy(() -> GuiceBoot.boot(Injector.class)),
+						.isThrownBy(() -> guiceBoot(Injector.class)),
 				() -> assertThatExceptionOfType(IllegalArgumentException.class)
-						.isThrownBy(() -> GuiceBoot.init().boot(Injector.class)),
+						.isThrownBy(() -> guiceInit().boot(Injector.class)),
 				() -> assertThatExceptionOfType(IllegalArgumentException.class)
-						.isThrownBy(() -> GuiceBoot.init(getClass()).boot(Injector.class)),
+						.isThrownBy(() -> guiceInit(getClass()).boot(Injector.class)),
 				() -> assertThatExceptionOfType(IllegalStateException.class)
-						.isThrownBy(() -> GuiceBoot.init().boot()),
+						.isThrownBy(() -> guiceInit().boot()),
 
 				() -> {});
 	}

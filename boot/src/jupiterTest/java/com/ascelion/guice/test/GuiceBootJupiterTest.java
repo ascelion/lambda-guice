@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.ascelion.guice.jupiter.GuiceBootExtension;
-import com.google.inject.Injector;
 import com.google.inject.Singleton;
 
 import jakarta.annotation.PostConstruct;
@@ -85,16 +84,9 @@ class GuiceBootJupiterTest {
 	static class Service4Provider implements Provider<Service4> {
 		int count;
 
-		@Inject
-		Injector injector;
-
 		@Override
 		public Service4 get() {
-			final var service4 = new Service4(this.count);
-
-			this.injector.injectMembers(service4);
-
-			return service4;
+			return new Service4(this.count);
 		}
 
 		@PostConstruct
@@ -125,16 +117,9 @@ class GuiceBootJupiterTest {
 	static class Service5Producer {
 		int count;
 
-		@Inject
-		Injector injector;
-
 		@Produces
 		Service5 create(Service4 service4) {
-			final var service5 = new Service5(this.count, service4);
-
-			this.injector.injectMembers(service5);
-
-			return service5;
+			return new Service5(this.count, service4);
 		}
 
 		Service5 dontCcreate() {
@@ -216,17 +201,10 @@ class GuiceBootJupiterTest {
 	static class Singleton4Provider implements Provider<Singleton4> {
 		int count;
 
-		@Inject
-		Injector injector;
-
 		@Override
 		@Singleton
 		public Singleton4 get() {
-			final var singleton4 = new Singleton4(this.count);
-
-			this.injector.injectMembers(singleton4);
-
-			return singleton4;
+			return new Singleton4(this.count);
 		}
 
 		@PostConstruct
@@ -257,17 +235,10 @@ class GuiceBootJupiterTest {
 	static class Singleton5Producer {
 		int count;
 
-		@Inject
-		Injector injector;
-
 		@Produces
 		@Singleton
 		Singleton5 create(Singleton4 singleton4) {
-			final var singleton5 = new Singleton5(this.count, singleton4);
-
-			this.injector.injectMembers(singleton5);
-
-			return singleton5;
+			return new Singleton5(this.count, singleton4);
 		}
 
 		Singleton5 dontCreate() {

@@ -10,7 +10,6 @@ import com.google.inject.matcher.Matchers;
 import com.google.inject.spi.InjectionListener;
 import com.google.inject.spi.TypeEncounter;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
@@ -45,13 +44,6 @@ public class PostConstructModule implements Module {
 		private void invoke(Method method, T injectee) {
 			method.setAccessible(true);
 			method.invoke(injectee);
-		}
-
-		@SneakyThrows
-		private Object value(Field field, T injectee) {
-			field.setAccessible(true);
-
-			return field.get(injectee);
 		}
 	}
 

@@ -1,21 +1,20 @@
 package com.ascelion.guice.test;
 
-import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
+import static com.ascelion.guice.GuiceBoot.guiceInit;
+import static com.ascelion.guice.internal.GuiceUtils.isAnnotatedWith;
 import static org.apache.commons.lang3.reflect.FieldUtils.getAllFieldsList;
 import static org.apache.commons.lang3.reflect.FieldUtils.getFieldsListWithAnnotation;
 import static org.apache.commons.lang3.reflect.MethodUtils.getMethodsListWithAnnotation;
 
-import com.ascelion.guice.GuiceBoot;
-import com.ascelion.guice.GuiceUtils;
-import com.google.inject.*;
+import com.ascelion.guice.internal.MemberProducer;
+import com.google.inject.Binder;
+import com.google.inject.Injector;
 import com.google.inject.Module;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.function.Supplier;
 
 import jakarta.enterprise.inject.Vetoed;
 import lombok.NonNull;
@@ -41,18 +40,19 @@ public final class GuiceMockStubsModule implements Module {
 		this.producerMethods = getMethodsListWithAnnotation(this.type, BindProducer.class, true, true);
 
 		this.stubs = getAllFieldsList(instance.getClass()).stream()
-				.filter(f -> GuiceUtils.isAnnotatedWith(f, stubAnnotation))
+				.filter(f -> isAnnotatedWith(f, stubAnnotation))
 				.filter(f -> TestResource.class.isAssignableFrom(f.getType()))
 				.toList();
 
-		final var init = GuiceBoot.init(this.type)
+		final var init = guiceInit(this.type)
+				.exclude(this.type)
 				.classes(this.type.getDeclaredClasses());
 
 		this.producerFields.forEach(field -> init.classes(field.getType()));
 		this.producerMethods.forEach(methods -> init.classes(methods.getReturnType()));
 
 		getAllFieldsList(instance.getClass()).stream()
-				.filter(f -> GuiceUtils.isAnnotatedWith(f, jakarta.inject.Inject.class, com.google.inject.Inject.class))
+				.filter(f -> isAnnotatedWith(f, jakarta.inject.Inject.class, com.google.inject.Inject.class))
 				.forEach(field -> init.classes(field.getType()));
 
 		if (instance instanceof final Module m) {
@@ -67,14 +67,12 @@ public final class GuiceMockStubsModule implements Module {
 	@Override
 	public void configure(Binder bnd) {
 		this.producerFields.forEach(field -> {
-			LOG.atTrace().addArgument(() -> fieldInfo(field)).log("Binding {}");
-
-			bnd.bind(field.getType()).toProvider((Provider) () -> fromField(field));
+			new MemberProducer<>(() -> this.instance, field, t -> () -> this.injector.getInstance(t))
+					.bind(bnd);
 		});
 		this.producerMethods.forEach(method -> {
-			LOG.atTrace().addArgument(() -> methodInfo(method)).log("Binding {}");
-
-			bnd.bind(method.getReturnType()).toProvider((Provider) () -> fromMethod(method));
+			new MemberProducer<>(() -> this.instance, method, t -> () -> this.injector.getInstance(t))
+					.bind(bnd);
 		});
 	}
 
@@ -93,44 +91,5 @@ public final class GuiceMockStubsModule implements Module {
 		if (ts != null) {
 			ts.setup();
 		}
-	}
-
-	@SneakyThrows
-	private Object fromField(Field field) {
-		field.setAccessible(true);
-
-		final var bean = nonNull(field.get(instance), () -> fieldInfo(field));
-
-		this.injector.injectMembers(bean);
-
-		return bean;
-	}
-
-	@SneakyThrows
-	private Object fromMethod(Method method) {
-		method.setAccessible(true);
-
-		final var bean = nonNull(method.invoke(this.instance), () -> methodInfo(method));
-
-		this.injector.injectMembers(bean);
-
-		return bean;
-	}
-
-	private static String fieldInfo(Field field) {
-		return format("field %s.%s", field.getDeclaringClass().getSimpleName(), field.getName());
-	}
-
-	private static String methodInfo(Method method) {
-		return format("method %s.%s()", method.getDeclaringClass().getSimpleName(), method.getName());
-	}
-
-	private Object nonNull(Object value, Supplier<String> info) {
-		if (value == null) {
-			throw new ProvisionException(format("Bound %s returned null, make sure Mockito "
-					+ "or any other provider is initialised first", info.get()));
-		}
-
-		return value;
 	}
 }

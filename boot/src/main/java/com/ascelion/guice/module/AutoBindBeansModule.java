@@ -1,7 +1,7 @@
 package com.ascelion.guice.module;
 
-import static com.ascelion.guice.GuiceUtils.isSingleton;
-import static com.ascelion.guice.GuiceUtils.isVetoed;
+import static com.ascelion.guice.internal.GuiceUtils.isSingleton;
+import static com.ascelion.guice.internal.GuiceUtils.isVetoed;
 
 import com.ascelion.guice.GuiceScan;
 import com.google.inject.AbstractModule;
@@ -33,19 +33,20 @@ public class AutoBindBeansModule extends AbstractModule {
 	protected void configure() {
 		final var classes = this.scanned.getAllClasses()
 				.filter(it -> !this.beanTypes.contains(it.getName()))
+				.filter(ClassInfo::isStandardClass)
 				.filter(ci -> !isVetoed(ci))
-				.filter(ClassInfo::isStandardClass);
+				.filter(this::hasEligibleConstructor);
 
 		for (final var ci : classes) {
 			// TODO: what about custom scopes?
 			final Class target = ci.loadClass();
 
 			if (isSingleton(target)) {
-				LOG.debug("Binding singleton {} to iself", target.getName());
+				LOG.debug("Binding singleton {} to itself", target.getName());
 
 				bind(target).in(Scopes.SINGLETON);
 			} else {
-				LOG.debug("Binding {} to iself", target.getName());
+				LOG.debug("Binding {} to itself", target.getName());
 
 				bind(target);
 			}
@@ -74,5 +75,22 @@ public class AutoBindBeansModule extends AbstractModule {
 				bind(itfc).to(target);
 			}
 		}
+	}
+
+	private boolean hasEligibleConstructor(ClassInfo ci) {
+		return hasSimpleConstructor(ci) || hasInjectConstructor(ci);
+	}
+
+	private boolean hasSimpleConstructor(ClassInfo ci) {
+		return ci.getDeclaredConstructorInfo()
+				.filter(mi -> mi.getParameterInfo().length == 0)
+				.size() == 1;
+	}
+
+	private boolean hasInjectConstructor(ClassInfo ci) {
+		return ci.getDeclaredConstructorInfo()
+				.filter(mi -> mi.hasAnnotation(jakarta.inject.Inject.class)
+						|| mi.hasAnnotation(com.google.inject.Inject.class))
+				.size() == 1;
 	}
 }
