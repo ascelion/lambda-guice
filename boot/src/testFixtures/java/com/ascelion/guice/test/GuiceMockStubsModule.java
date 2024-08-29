@@ -56,7 +56,7 @@ public final class GuiceMockStubsModule implements Module {
 				.forEach(field -> init.classes(field.getType()));
 
 		if (instance instanceof final Module m) {
-			init.modules(m);
+			init.overrides(m);
 		}
 
 		init.overrides(this);
@@ -67,11 +67,11 @@ public final class GuiceMockStubsModule implements Module {
 	@Override
 	public void configure(Binder bnd) {
 		this.producerFields.forEach(field -> {
-			new MemberProducer<>(() -> this.instance, field, t -> () -> this.injector.getInstance(t))
+			new MemberProducer(field, () -> this.instance, () -> this.injector)
 					.bind(bnd);
 		});
 		this.producerMethods.forEach(method -> {
-			new MemberProducer<>(() -> this.instance, method, t -> () -> this.injector.getInstance(t))
+			new MemberProducer(method, () -> this.instance, () -> this.injector)
 					.bind(bnd);
 		});
 	}

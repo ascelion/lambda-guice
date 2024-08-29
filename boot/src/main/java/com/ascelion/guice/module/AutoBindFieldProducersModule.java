@@ -3,6 +3,7 @@ package com.ascelion.guice.module;
 import com.ascelion.guice.GuiceScan;
 import com.ascelion.guice.internal.MemberProducer;
 import com.google.inject.AbstractModule;
+import com.google.inject.Injector;
 
 import java.lang.reflect.Field;
 import java.util.Set;
@@ -40,7 +41,7 @@ public class AutoBindFieldProducersModule extends AbstractModule {
 				final Field field = fi.loadClassAndGetField();
 				final Class target = field.getType();
 
-				new MemberProducer<>(getProvider(source), field, this::getProvider)
+				new MemberProducer(field, getProvider(source), getProvider(Injector.class))
 						.bind(binder());
 
 				this.beanTypes.add(target.getName());

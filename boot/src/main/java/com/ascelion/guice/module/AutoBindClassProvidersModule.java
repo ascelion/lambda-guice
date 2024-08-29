@@ -3,6 +3,7 @@ package com.ascelion.guice.module;
 import com.ascelion.guice.GuiceScan;
 import com.ascelion.guice.internal.MemberProducer;
 import com.google.inject.AbstractModule;
+import com.google.inject.Injector;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -48,7 +49,7 @@ public class AutoBindClassProvidersModule extends AbstractModule {
 				throw new CreationException("Cannot find provider method", e);
 			}
 
-			new MemberProducer<>(getProvider(source), method, this::getProvider)
+			new MemberProducer(method, getProvider(source), getProvider(Injector.class))
 					.bind(binder());
 
 			this.beanTypes.add(target.getName());
