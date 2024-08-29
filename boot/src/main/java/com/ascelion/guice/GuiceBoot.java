@@ -23,11 +23,11 @@ public class GuiceBoot {
 	private final List<Module> overrides;
 
 	public static <T> T guiceBoot(Class<T> type) {
-		if (Injector.class.isAssignableFrom(type)) {
-			throw new IllegalArgumentException("Invalid type, use GuiceBoot.init(...).boot() to create an injector");
-		}
+		return guiceInit().boot(type);
+	}
 
-		return guiceInit(type).boot(type);
+	public static <T> T guiceBoot(T instance) {
+		return guiceInit().boot(instance);
 	}
 
 	public static GuiceInit guiceInit(Class<?>... classes) {

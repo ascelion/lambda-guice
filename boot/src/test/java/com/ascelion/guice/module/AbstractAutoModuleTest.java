@@ -2,6 +2,7 @@ package com.ascelion.guice.module;
 
 import static com.ascelion.guice.GuiceBoot.guiceInit;
 
+import com.ascelion.guice.internal.BootstrapContext;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -35,14 +36,14 @@ public abstract class AbstractAutoModuleTest {
 
 			inj = inj0.createChildInjector(all);
 		} else {
-			final Set<String> set = new HashSet<>();
+			final BootstrapContext ctx = new BootstrapContext(ini.scan());
 			final List<Module> all = new ArrayList<>();
 
 			all.add(strict);
-			all.add(new AutoBindClassProvidersModule(ini.scan(), set));
-			all.add(new AutoBindMethodProducersModule(ini.scan(), set));
-			all.add(new AutoBindFieldProducersModule(ini.scan(), set));
-			all.add(new AutoBindBeansModule(ini.scan(), set));
+			all.add(new AutoBindClassProvidersModule(ctx));
+			all.add(new AutoBindMethodProducersModule(ctx));
+			all.add(new AutoBindFieldProducersModule(ctx));
+			all.add(new AutoBindBeansModule(ctx));
 
 			if (postConstruct) {
 				all.add(new PostConstructModule());

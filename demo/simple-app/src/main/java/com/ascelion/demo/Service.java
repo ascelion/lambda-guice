@@ -19,6 +19,10 @@ public class Service {
 	List<String> args2;
 
 	@Inject
+	@Named("E")
+	BigDecimal e;
+
+	@Inject
 	@Named("PI")
 	BigDecimal pi;
 
@@ -29,6 +33,7 @@ public class Service {
 	}
 
 	public void run() {
+		LOG.info("E: {}", this.e);
 		LOG.info("PI: {}", this.pi);
 	}
 }

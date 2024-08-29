@@ -2,32 +2,19 @@ package com.ascelion.guice;
 
 import static java.util.Optional.ofNullable;
 
-import com.google.inject.*;
+import com.ascelion.guice.internal.BootstrapContext;
+import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.Scopes;
 
 import java.util.*;
 
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
 import jakarta.enterprise.inject.Vetoed;
-import jakarta.enterprise.util.AnnotationLiteral;
-import jakarta.inject.Named;
-import lombok.RequiredArgsConstructor;
+import lombok.NonNull;
 
 public class GuiceInit {
-	@RequiredArgsConstructor
-	static class NamedLiteral extends AnnotationLiteral<Named> implements Named {
-		final String value;
-
-		@Override
-		public String value() {
-			return this.value;
-		}
-	}
-
-	static class StringSetLiteral extends TypeLiteral<Set<String>> {
-	}
-
 	private final Set<String> classes = new HashSet<>();
 	private final Set<String> packages = new HashSet<>();
 	private final List<Module> modules = new ArrayList<>();
@@ -100,7 +87,7 @@ public class GuiceInit {
 		return new GuiceBoot(this, this.modules, this.overrides).construct(Injector.class);
 	}
 
-	public <T> T boot(Class<T> type) {
+	public <T> T boot(@NonNull Class<T> type) {
 		if (Injector.class.isAssignableFrom(type)) {
 			throw new IllegalArgumentException("Invalid type, use GuiceBoot.init(...).boot() to create an injector");
 		}
@@ -110,15 +97,26 @@ public class GuiceInit {
 		return new GuiceBoot(this, this.modules, this.overrides).construct(type);
 	}
 
+	public <T> T boot(@NonNull T instance) {
+		if (instance instanceof Injector) {
+			throw new IllegalArgumentException("Invalid type, use GuiceBoot.init(...).boot() to create an injector");
+		}
+
+		classes(instance.getClass());
+
+		boot().injectMembers(instance);
+
+		return instance;
+	}
+
 	public Module buildInitModule() {
 		return bnd -> {
 			bnd.bind(ScanResult.class)
 					.annotatedWith(GuiceScan.class)
 					.toProvider(this::scan)
 					.in(Scopes.SINGLETON);
-			bnd.bind(new StringSetLiteral())
-					.annotatedWith(new NamedLiteral("beanTypes"))
-					.toInstance(new TreeSet<>());
+			bnd.bind(BootstrapContext.class)
+					.in(Scopes.SINGLETON);
 		};
 	}
 }

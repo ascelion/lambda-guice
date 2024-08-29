@@ -1,17 +1,14 @@
 package com.ascelion.guice.module;
 
-import com.ascelion.guice.GuiceScan;
+import com.ascelion.guice.internal.BootstrapContext;
 import com.ascelion.guice.internal.MemberProducer;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 
 import java.lang.reflect.Field;
-import java.util.Set;
 
-import io.github.classgraph.ScanResult;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,17 +19,12 @@ import lombok.extern.slf4j.Slf4j;
 public class AutoBindFieldProducersModule extends AbstractModule {
 
 	@Inject
-	@GuiceScan
-	private ScanResult scanned;
-
-	@Inject
-	@Named("beanTypes")
-	private Set<String> beanTypes;
+	private BootstrapContext context;
 
 	@Override
 	protected void configure() {
-		final var classes = this.scanned.getClassesWithFieldAnnotation(Produces.class)
-				.filter(it -> !this.beanTypes.contains(it.getName()));
+		final var classes = this.context.getScanned().getClassesWithFieldAnnotation(Produces.class)
+				.filter(it -> !this.context.containsBean(it));
 
 		for (final var ci : classes) {
 			final Class source = ci.loadClass();
@@ -44,7 +36,7 @@ public class AutoBindFieldProducersModule extends AbstractModule {
 				new MemberProducer(field, getProvider(source), getProvider(Injector.class))
 						.bind(binder());
 
-				this.beanTypes.add(target.getName());
+				this.context.addBean(target);
 			}
 		}
 	}

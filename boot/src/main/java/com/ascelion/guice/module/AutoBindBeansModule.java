@@ -3,15 +3,13 @@ package com.ascelion.guice.module;
 import static com.ascelion.guice.internal.GuiceUtils.isSingleton;
 import static com.ascelion.guice.internal.GuiceUtils.isVetoed;
 
-import com.ascelion.guice.GuiceScan;
+import com.ascelion.guice.internal.BootstrapContext;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 
-import java.util.Set;
-
 import io.github.classgraph.ClassInfo;
-import io.github.classgraph.ScanResult;
-import jakarta.inject.*;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,17 +20,12 @@ import lombok.extern.slf4j.Slf4j;
 public class AutoBindBeansModule extends AbstractModule {
 
 	@Inject
-	@GuiceScan
-	private ScanResult scanned;
-
-	@Inject
-	@Named("beanTypes")
-	private Set<String> beanTypes;
+	private BootstrapContext context;
 
 	@Override
 	protected void configure() {
-		final var classes = this.scanned.getAllClasses()
-				.filter(it -> !this.beanTypes.contains(it.getName()))
+		final var classes = this.context.getScanned().getAllClasses()
+				.filter(it -> !this.context.containsBean(it))
 				.filter(ClassInfo::isStandardClass)
 				.filter(ci -> !isVetoed(ci))
 				.filter(this::hasEligibleConstructor);
@@ -51,6 +44,8 @@ public class AutoBindBeansModule extends AbstractModule {
 				bind(target);
 			}
 
+			this.context.addBean(target);
+			
 			if (ci.getInterfaces().size() != 1) {
 				continue;
 			}
