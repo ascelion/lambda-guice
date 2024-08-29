@@ -1,5 +1,7 @@
 package com.ascelion.guice.module;
 
+import static com.ascelion.guice.ModulePriorities.MODULE_PRIORITY_OFFSET;
+import static com.ascelion.guice.ModulePriorities.SCOPE_MODULE_PRIORITY;
 import static java.lang.System.identityHashCode;
 import static org.apache.commons.lang3.reflect.MethodUtils.getMethodsListWithAnnotation;
 
@@ -16,10 +18,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Priority;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@Priority(SCOPE_MODULE_PRIORITY - MODULE_PRIORITY_OFFSET)
+@SuppressWarnings({ "rawtypes" })
 @Slf4j
 public class PostConstructModule implements Module {
 	static class PostConstructInjectionListener<T> implements InjectionListener<T> {

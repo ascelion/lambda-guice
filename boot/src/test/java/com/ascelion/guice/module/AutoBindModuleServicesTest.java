@@ -132,6 +132,30 @@ class AutoBindModuleServicesTest extends AbstractAutoModuleTest {
 		}
 	}
 
+	static class Cyclic1 {
+		@Inject
+		Cyclic2 pair;
+
+		int count;
+
+		@PostConstruct
+		void init() {
+			this.count++;
+		}
+	}
+
+	static class Cyclic2 {
+		@Inject
+		Cyclic1 pair;
+
+		int count;
+
+		@PostConstruct
+		void init() {
+			this.count++;
+		}
+	}
+
 	@ParameterizedTest
 	@CsvSource({
 			"false,false,false",
@@ -155,6 +179,9 @@ class AutoBindModuleServicesTest extends AbstractAutoModuleTest {
 
 		final var service4 = inj.getInstance(Service4.class);
 		final var service5 = inj.getInstance(Service5.class);
+
+		final var cyclic1 = inj.getInstance(Cyclic1.class);
+		final var cyclic2 = inj.getInstance(Cyclic2.class);
 
 		final var count1 = postConstruct ? 1 : 0;
 		final var count2 = postConstruct ? 2 : 0;
@@ -183,6 +210,14 @@ class AutoBindModuleServicesTest extends AbstractAutoModuleTest {
 				() -> assertThat(service5).extracting("service4.service3.count").isEqualTo(count1),
 				() -> assertThat(service5).extracting("service4.service3.service2.count").isEqualTo(count1),
 				() -> assertThat(service5).extracting("service4.service3.service2.service1.count").isEqualTo(count1),
+
+				() -> assertThat(cyclic1).extracting("count").isEqualTo(count1),
+				() -> assertThat(cyclic1).extracting("pair.count").isEqualTo(count1),
+				() -> assertThat(cyclic1).extracting("pair.pair").isSameAs(cyclic1),
+
+				() -> assertThat(cyclic2).extracting("count").isEqualTo(count1),
+				() -> assertThat(cyclic2).extracting("pair.count").isEqualTo(count1),
+				() -> assertThat(cyclic2).extracting("pair.pair").isSameAs(cyclic2),
 
 				() -> {});
 	}

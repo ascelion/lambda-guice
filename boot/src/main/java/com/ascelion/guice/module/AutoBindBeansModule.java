@@ -1,5 +1,7 @@
 package com.ascelion.guice.module;
 
+import static com.ascelion.guice.ModulePriorities.MODULE_PRIORITY_OFFSET;
+import static com.ascelion.guice.ModulePriorities.PROVIDER_MODULE_PRIORITY;
 import static com.ascelion.guice.internal.GuiceUtils.isSingleton;
 import static com.ascelion.guice.internal.GuiceUtils.isVetoed;
 
@@ -8,12 +10,14 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 
 import io.github.classgraph.ClassInfo;
+import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@Priority(PROVIDER_MODULE_PRIORITY + 2 * MODULE_PRIORITY_OFFSET)
+@SuppressWarnings({ "rawtypes" })
 @Slf4j
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
@@ -45,7 +49,7 @@ public class AutoBindBeansModule extends AbstractModule {
 			}
 
 			this.context.addBean(target);
-			
+
 			if (ci.getInterfaces().size() != 1) {
 				continue;
 			}

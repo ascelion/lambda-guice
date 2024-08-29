@@ -1,5 +1,7 @@
 package com.ascelion.guice.module;
 
+import static com.ascelion.guice.ModulePriorities.PROVIDER_MODULE_PRIORITY;
+
 import com.ascelion.guice.internal.BootstrapContext;
 import com.ascelion.guice.internal.MemberProducer;
 import com.google.inject.AbstractModule;
@@ -8,13 +10,15 @@ import com.google.inject.Injector;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 
+import jakarta.annotation.Priority;
 import jakarta.enterprise.inject.CreationException;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@Priority(PROVIDER_MODULE_PRIORITY)
+@SuppressWarnings({ "rawtypes" })
 @Slf4j
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PACKAGE)

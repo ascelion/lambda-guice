@@ -7,7 +7,8 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class AbstractAutoModuleTest {
 	Injector createInjector(boolean explicitBinding, boolean childInjector, boolean postConstruct) {

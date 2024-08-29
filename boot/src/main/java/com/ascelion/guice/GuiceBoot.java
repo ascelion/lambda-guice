@@ -53,6 +53,8 @@ public class GuiceBoot {
 
 		allModules.addAll(this.modules);
 
+		Collections.sort(allModules, ModulePriorities::compareModules);
+
 		return first.createChildInjector(Modules.override(allModules).with(this.overrides));
 	}
 
