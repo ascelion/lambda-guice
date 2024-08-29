@@ -15,6 +15,6 @@ class Service {
 	private SQSEvent event;
 
 	public void proceed() {
-		LOG.info("Got event with id {} as {}", this.context.getAwsRequestId(), this.event);
+		LOG.info("Got event with id {} as {}", this.context.getAwsRequestId(), this.event.getRecords());
 	}
 }

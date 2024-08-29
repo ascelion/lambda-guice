@@ -13,10 +13,10 @@ import static uk.org.webcompere.systemstubs.SystemStubs.withEnvironmentVariable;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.events.SQSEvent;
 import com.amazonaws.services.lambda.runtime.serialization.PojoSerializer;
+import com.amazonaws.services.lambda.runtime.tests.annotations.Event;
 import com.ascelion.guice.request.RequestScoped;
 
 import java.io.*;
-import java.util.List;
 import java.util.concurrent.Callable;
 
 import jakarta.enterprise.inject.Produces;
@@ -29,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.org.webcompere.systemstubs.environment.EnvironmentVariables;
@@ -38,6 +39,8 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SystemStubsExtension.class)
 class GuiceGlueHandlerTest {
+
+	private static final String EVENT_JSON = "sqs-event.json";
 
 	static class HandlerCallable implements Callable<String> {
 		@Override
@@ -265,16 +268,12 @@ class GuiceGlueHandlerTest {
 		assertThatJson(oJson).isObject().containsEntry("value", "HIHI");
 	}
 
-	@Test
-	void handlerWithEvent() {
+	@ParameterizedTest
+	@Event(value = EVENT_JSON, type = SQSEvent.class)
+	void handlerWithEvent(SQSEvent event) {
+		assertThat(event.getRecords()).hasSizeGreaterThan(0);
+
 		final var glue = new GuiceGlueHandler(HandlerWithEvent.class.getName() + "::invoke");
-		final var event = new SQSEvent();
-		final var message = new SQSEvent.SQSMessage();
-
-		message.setAwsRegion("eu-west-1");
-
-		event.setRecords(List.of(message));
-
 		final var inputBuf = new ByteArrayOutputStream();
 
 		serializerFor(SQSEvent.class, currentThread().getContextClassLoader()).toJson(event, inputBuf);
@@ -289,16 +288,12 @@ class GuiceGlueHandlerTest {
 		assertThatJson(iJson).isEqualTo(oJson);
 	}
 
-	@Test
-	void handlerWithEventToRequest() {
+	@ParameterizedTest
+	@Event(value = EVENT_JSON, type = SQSEvent.class)
+	void handlerWithEventToRequest(SQSEvent event) {
+		assertThat(event.getRecords()).hasSizeGreaterThan(0);
+
 		final var glue = new GuiceGlueHandler(HandlerWithEventToRequest.class.getName() + "::invoke");
-		final var event = new SQSEvent();
-		final var message = new SQSEvent.SQSMessage();
-
-		message.setAwsRegion("eu-east-1");
-
-		event.setRecords(List.of(message));
-
 		final var inputBuf = new ByteArrayOutputStream();
 
 		serializerFor(SQSEvent.class, currentThread().getContextClassLoader()).toJson(event, inputBuf);
@@ -309,18 +304,15 @@ class GuiceGlueHandlerTest {
 
 		final var oJson = StringUtils.toEncodedString(this.output.toByteArray(), UTF_8);
 
-		assertThatJson(oJson).isObject().containsEntry("region", "eu-east-1");
+		assertThatJson(oJson).isObject().containsEntry("region", event.getRecords().get(0).getAwsRegion());
 	}
 
-	@Test
-	void handlerWithEventToRequestAsParam() {
+	@ParameterizedTest
+	@Event(value = EVENT_JSON, type = SQSEvent.class)
+	void handlerWithEventToRequestAsParam(SQSEvent event) {
+		assertThat(event.getRecords()).hasSizeGreaterThan(0);
+
 		final var glue = new GuiceGlueHandler(HandlerWithEventToRequestAsParam.class.getName() + "::invoke");
-		final var event = new SQSEvent();
-		final var message = new SQSEvent.SQSMessage();
-
-		message.setAwsRegion("eu-east-1");
-
-		event.setRecords(List.of(message));
 
 		final var inputBuf = new ByteArrayOutputStream();
 
@@ -332,6 +324,6 @@ class GuiceGlueHandlerTest {
 
 		final var oJson = StringUtils.toEncodedString(this.output.toByteArray(), UTF_8);
 
-		assertThatJson(oJson).isObject().containsEntry("region", "eu-east-1");
+		assertThatJson(oJson).isObject().containsEntry("region", event.getRecords().get(0).getAwsRegion());
 	}
 }

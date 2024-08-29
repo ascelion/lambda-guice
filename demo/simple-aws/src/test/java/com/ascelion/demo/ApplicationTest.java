@@ -1,6 +1,7 @@
 package com.ascelion.demo;
 
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.*;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.events.SQSEvent;
@@ -28,9 +29,13 @@ class ApplicationTest {
 	@Test
 	void run() {
 		when(this.context.getAwsRequestId()).thenReturn("mocked request id");
-		when(this.event.toString()).thenReturn("mocked event");
 
 		this.app.handleRequest(this.event, this.context);
+
+		assertAll(
+				() -> verify(this.context, times(1)).getAwsRequestId(),
+				() -> verify(this.event, times(1)).getRecords(),
+				() -> {});
 	}
 
 }

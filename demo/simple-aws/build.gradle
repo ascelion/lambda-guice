@@ -1,6 +1,5 @@
 plugins {
 	id 'build.java-lambda'
-	id 'build.java-tests'
 }
 
 dependencies {
@@ -21,8 +20,8 @@ dependencies {
 	}
 	integrationTestImplementation tests.tc.core
 	integrationTestImplementation tests.tc.localstack
-	integrationTestImplementation libs.aws.lambda.events
 	integrationTestImplementation libs.aws.lambda.serialization
+
 	integrationTestImplementation 'software.amazon.awssdk:lambda'
 	integrationTestImplementation 'software.amazon.awssdk:sqs'
 }

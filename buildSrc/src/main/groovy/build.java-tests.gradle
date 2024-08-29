@@ -17,6 +17,9 @@ testing {
 				implementation tests.assertj
 				implementation tests.assertj.json
 				implementation tests.mockito.core
+
+				// for assertj-json
+				runtimeOnly 'com.google.code.gson:gson:2.11.0'
 			}
 		}
 

@@ -30,6 +30,10 @@ lombok {
 
 dependencies {
 	deps libs.slf4j.api
+
+	deps libs.commons.io
+	deps libs.commons.lang3
+	deps libs.commons.collections4
 }
 
 def compileAllTask = tasks.register('compileAll')

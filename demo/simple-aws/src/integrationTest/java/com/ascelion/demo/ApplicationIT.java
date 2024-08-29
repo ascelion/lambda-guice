@@ -1,16 +1,11 @@
 package com.ascelion.demo;
 
-import static com.amazonaws.services.lambda.runtime.serialization.events.LambdaEventSerializers.serializerFor;
 import static java.lang.String.format;
-import static java.lang.Thread.currentThread;
 import static java.util.stream.Collectors.joining;
+import static org.apache.commons.io.IOUtils.resourceToByteArray;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import com.amazonaws.services.lambda.runtime.events.SQSEvent;
-
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.List;
 import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
@@ -103,14 +98,14 @@ class ApplicationIT {
 
 	@Test
 	void sqsBatch() {
-		final var sqsClient = SqsClient.builder()
+		final var client = SqsClient.builder()
 				.endpointOverride(this.container.getEndpointOverride(LocalStackContainer.Service.SQS))
 				.credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(
 						this.container.getAccessKey(), this.container.getSecretKey())))
 				.region(Region.of(REGION))
 				.build();
 
-		final GetQueueUrlResponse urlResponse = sqsClient
+		final GetQueueUrlResponse urlResponse = client
 				.getQueueUrl(GetQueueUrlRequest.builder().queueName(LAMBDA_FUNCTION).build());
 
 		final var request = SendMessageRequest.builder()
@@ -118,37 +113,29 @@ class ApplicationIT {
 				.messageBody("HIHI")
 				.build();
 
-		final var response = sqsClient.sendMessage(request);
+		final var response = client.sendMessage(request);
 
 		LOG.info("{}", response);
 	}
 
 	@Test
-	void lambdaInvoke() {
-		final var awsClient = LambdaClient.builder()
+	void lambdaInvoke() throws IOException {
+		final var client = LambdaClient.builder()
 				.endpointOverride(this.container.getEndpointOverride(LocalStackContainer.Service.LAMBDA))
 				.credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(
 						this.container.getAccessKey(), this.container.getSecretKey())))
 				.region(Region.of(REGION))
 				.build();
-		final var event = new SQSEvent();
-		final var message = new SQSEvent.SQSMessage();
 
-		message.setAwsRegion("eu-east-1");
-
-		event.setRecords(List.of(message));
-
-		final var inputBuf = new ByteArrayOutputStream();
-
-		serializerFor(SQSEvent.class, currentThread().getContextClassLoader()).toJson(event, inputBuf);
+		final var input = resourceToByteArray("/sqs-event.json");
 
 		final var request = InvokeRequest.builder()
 				.functionName(LAMBDA_FUNCTION)
 				.logType(LogType.TAIL)
-				.payload(SdkBytes.fromByteArrayUnsafe(inputBuf.toByteArray()))
+				.payload(SdkBytes.fromByteArrayUnsafe(input))
 				.build();
 
-		final var response = awsClient.invoke(request);
+		final var response = client.invoke(request);
 
 		LOG.info("{}", response);
 	}

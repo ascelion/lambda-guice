@@ -35,10 +35,8 @@ dependencies {
 
 	implementation libs.bytebuddy
 	implementation libs.classgraph
-	implementation libs.commons.lang3
 
 	testFixturesApi tests.mockito.core
-	testFixturesImplementation libs.commons.lang3
 	testFixturesImplementation tests.system.stubs.core
 
 	jupiterApi platform(tests.jupiter.bom)

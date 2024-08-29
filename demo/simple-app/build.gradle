@@ -1,6 +1,5 @@
 plugins {
 	id 'build.java-application'
-	id 'build.java-tests'
 }
 
 dependencies {

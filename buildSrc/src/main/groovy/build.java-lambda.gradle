@@ -5,11 +5,23 @@ plugins {
 dependencies {
 	deps platform(libs.aws.sdk.java2.bom)
 
-	implementation libs.aws.lambda.core
-	implementation libs.aws.lambda.events
-
 	runtimeOnly libs.log4j.slf4j
-	runtimeOnly libs.aws.lambda.log4j
+
+	compileOnly libs.aws.lambda.core
+	compileOnly libs.aws.lambda.events
+	compileOnly libs.aws.lambda.log4j
+}
+
+testing {
+	suites {
+		configureEach {
+			dependencies {
+				implementation libs.aws.lambda.tests
+				implementation libs.aws.lambda.core
+				implementation libs.aws.lambda.events
+			}
+		}
+	}
 }
 
 tasks.register 'zip', Zip, {

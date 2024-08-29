@@ -5,22 +5,17 @@ plugins {
 
 dependencies {
 	implementation project(':boot')
-
-	implementation libs.aws.lambda.serialization
 	implementation libs.classgraph
-	implementation libs.commons.io
-	implementation libs.commons.lang3
 
-	compileOnly 'com.amazonaws:aws-lambda-java-runtime-interface-client:2.3.2'
+	compileOnly libs.aws.lambda.serialization
+	compileOnly libs.aws.lambda.ric
 
 	testImplementation testFixtures(project(':boot'))
-	testImplementation libs.commons.collections4
 	testImplementation project(':boot'), {
 		capabilities {
 			requireCapability("${project.group}:boot-jupiter")
 		}
 	}
-	testRuntimeOnly 'com.google.code.gson:gson:2.11.0'
 }
 
 tasks.named 'zip', {
