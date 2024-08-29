@@ -30,6 +30,8 @@ dependencyResolutionManagement {
 			library('guice-bom', 'com.google.inject:guice-bom:7.0.0')
 			library('guice', 'com.google.inject', 'guice').withoutVersion()
 
+			library('guava', 'com.google.guava:guava:33.3.0-jre')
+
 			library('jakarta-bom', 'jakarta.platform:jakarta.jakartaee-bom:10.0.0')
 			library('jakarta-annotation', 'jakarta.annotation', 'jakarta.annotation-api').withoutVersion()
 			library('jakarta-cdi', 'jakarta.enterprise', 'jakarta.enterprise.cdi-api').withoutVersion()

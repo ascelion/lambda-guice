@@ -1,9 +1,13 @@
 plugins {
+	id 'java-library'
 	id 'build.java-lambda'
-	id 'build.java-tests'
 }
 
 dependencies {
+	api libs.jakarta.annotation
+	api libs.jakarta.cdi
+	api libs.jakarta.inject
+
 	implementation project(':boot')
 	implementation libs.classgraph
 

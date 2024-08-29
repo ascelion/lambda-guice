@@ -15,19 +15,19 @@ import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
 @GuiceScan(
-		packages = Application.class,
+		packages = RequestApp.class,
 		classes = {
 				RequestScope.class,
 		})
 @Slf4j
-public class Application {
+public class RequestApp {
 
 	static final List<Integer> INVOCATIONS = IntStream.range(0, 100)
 			.mapToObj(Integer::valueOf)
 			.toList();
 
 	public static void main(String[] args) {
-		guiceBoot(Application.class);
+		guiceBoot(RequestApp.class);
 	}
 
 	@Inject

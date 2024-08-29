@@ -1,5 +1,8 @@
 package com.ascelion.guice.internal;
 
+import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang3.StringUtils.trimToNull;
+
 import com.google.inject.BindingAnnotation;
 import com.google.inject.ScopeAnnotation;
 
@@ -66,5 +69,22 @@ public final class GuiceUtils {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Retrieves a configuration value from {@code System.env} then from {@code System.properties}, following <a href=
+	 * "https://docs.spring.io/spring-boot/reference/features/external-config.html#features.external-config.typesafe-configuration-properties.relaxed-binding.environment-variables">Spring
+	 * binding conventions</a>.
+	 * <p>
+	 * When both environment and system property are defined, the environment variable wins.
+	 * </p>
+	 */
+	public static Optional<String> externalConfiguration(String property) {
+		return ofNullable(trimToNull(System.getenv(configurationEnvName(property))))
+				.or(() -> ofNullable(trimToNull(System.getProperty(property))));
+	}
+
+	public static String configurationEnvName(String property) {
+		return property.toUpperCase().replace('.', '_').replace("-", "");
 	}
 }

@@ -1,6 +1,8 @@
 package com.ascelion.lambda;
 
 import static com.amazonaws.services.lambda.runtime.serialization.events.LambdaEventSerializers.serializerFor;
+import static com.ascelion.guice.internal.GuiceUtils.configurationEnvName;
+import static com.ascelion.lambda.GuiceGlueHandler.ENTRY_POINT_PROPERTY;
 import static java.lang.Thread.currentThread;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -207,7 +209,7 @@ class GuiceGlueHandlerTest {
 	private final ByteArrayOutputStream output = new ByteArrayOutputStream();
 
 	@SystemStub
-	private final EnvironmentVariables environ = withEnvironmentVariable(GuiceGlueHandler.GUICE_GLUE_HANDLER_ENV,
+	private final EnvironmentVariables environ = withEnvironmentVariable(configurationEnvName(ENTRY_POINT_PROPERTY),
 			HandlerCallable.class.getName());
 
 	@Mock

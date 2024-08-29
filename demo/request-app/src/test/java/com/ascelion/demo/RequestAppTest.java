@@ -1,6 +1,6 @@
 package com.ascelion.demo;
 
-import static com.ascelion.demo.Application.INVOCATIONS;
+import static com.ascelion.demo.RequestApp.INVOCATIONS;
 import static org.mockito.Mockito.*;
 
 import com.ascelion.guice.jupiter.GuiceBootExtension;
@@ -14,13 +14,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(GuiceBootExtension.class)
-class ApplicationTest {
+class RequestAppTest {
 
 	@BindProducer
 	static AppContext ctx = mock(AppContext.class);
 
 	@Inject
-	Application app;
+	RequestApp app;
 
 	@BeforeAll
 	static void setUpClass() {

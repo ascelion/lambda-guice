@@ -12,11 +12,11 @@ import lombok.extern.slf4j.Slf4j;
 		Producers.class,
 		Service.class,
 })
-public class Application {
+public class SimpleApp {
 	public static void main(String[] args) {
-		guiceInit(Application.class)
+		guiceInit(SimpleApp.class)
 				.modules(new ArgumentsModule(args))
-				.boot(Application.class)
+				.boot(SimpleApp.class)
 				.start();
 	}
 

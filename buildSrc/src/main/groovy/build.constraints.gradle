@@ -12,4 +12,8 @@ dependencies {
 	deps platform(libs.jakarta.bom)
 	deps platform(libs.log4j.bom)
 	deps platform(libs.slf4j.bom)
+
+	constraints {
+		deps libs.guava
+	}
 }

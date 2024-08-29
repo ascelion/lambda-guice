@@ -12,12 +12,12 @@ import jakarta.inject.Inject;
 import lombok.AllArgsConstructor;
 
 @GuiceScan(
-		packages = Application.class,
+		packages = SimpleAws.class,
 		classes = {
 				RequestScope.class,
 		})
 @AllArgsConstructor(onConstructor_ = @Inject)
-public class Application implements RequestHandler<SQSEvent, Void> {
+public class SimpleAws implements RequestHandler<SQSEvent, Void> {
 
 	@Inject
 	private Service service;
@@ -25,7 +25,7 @@ public class Application implements RequestHandler<SQSEvent, Void> {
 	@Inject
 	private RequestScope scope;
 
-	public Application() {
+	public SimpleAws() {
 		guiceBoot(this);
 	}
 

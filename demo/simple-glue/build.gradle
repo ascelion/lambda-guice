@@ -1,0 +1,14 @@
+plugins {
+	id 'build.java-lambda'
+}
+
+dependencies {
+	implementation project(':glue')
+
+	testImplementation testFixtures(project(':boot'))
+	testImplementation project(':boot'), {
+		capabilities {
+			requireCapability("${project.group}:boot-jupiter")
+		}
+	}
+}

@@ -15,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(GuiceBootExtension.class)
-class ApplicationTest {
+class SimpleAwsTest {
 
 	@Mock
 	Context context;
@@ -24,7 +24,7 @@ class ApplicationTest {
 	SQSEvent event;
 
 	@Inject
-	Application app;
+	SimpleAws app;
 
 	@Test
 	void run() {

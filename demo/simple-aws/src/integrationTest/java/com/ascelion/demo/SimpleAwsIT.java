@@ -28,9 +28,9 @@ import software.amazon.awssdk.services.sqs.model.*;
 
 @TestInstance(Lifecycle.PER_CLASS)
 @Slf4j
-class ApplicationIT {
+class SimpleAwsIT {
 	static final String LAMBDA_FUNCTION = "simple-aws";
-	static final String LAMBDA_HANDLER = Application.class.getName() + "::handleRequest";
+	static final String LAMBDA_HANDLER = SimpleAws.class.getName() + "::handleRequest";
 	static final String LOCAL_STACK_VERSION = System.getProperty("localstack.version", "3.6");
 	static final DockerImageName LOCAL_STACK_IMAGE = DockerImageName
 			.parse("localstack/localstack:" + LOCAL_STACK_VERSION);

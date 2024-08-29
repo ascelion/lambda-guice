@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(GuiceBootExtension.class)
-class ApplicationTest {
+class SimpleAppTest {
 
 	@BindProducer
 	@Arguments
@@ -26,7 +26,7 @@ class ApplicationTest {
 	final List<String> args2 = List.of(this.args1);
 
 	@Inject
-	Application app;
+	SimpleApp app;
 
 	@Test
 	void run() {
