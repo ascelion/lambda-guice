@@ -13,11 +13,13 @@ dependencies {
 	implementation libs.commons.lang3
 
 	testFixturesApi tests.mockito.core
+
 	testFixturesCompileOnly platform(tests.jupiter.bom)
 	testFixturesCompileOnly tests.jupiter.api
 	testFixturesCompileOnly tests.testng
-	testFixturesCompileOnly tests.system.stubs.jupiter
-	testFixturesCompileOnly tests.system.stubs.testng
+
+	testFixturesImplementation tests.system.stubs.jupiter
+	testFixturesImplementation tests.system.stubs.testng
 	testFixturesImplementation libs.commons.lang3
 }
 

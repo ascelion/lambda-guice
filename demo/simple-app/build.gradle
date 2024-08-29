@@ -1,0 +1,19 @@
+plugins {
+    id 'build.java-application'
+	id 'build.java-tests'
+}
+
+dependencies {
+    implementation project(':boot')
+	implementation libs.log4j.slf4j
+
+	testImplementation testFixtures(project(':boot'))
+}
+
+application {
+    mainClass = 'com.ascelion.demo.Application'
+}
+
+run {
+	args 'one', 'two'
+}
