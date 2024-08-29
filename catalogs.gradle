@@ -14,7 +14,8 @@ dependencyResolutionManagement {
 			library('aws-lambda-core', 'com.amazonaws:aws-lambda-java-core:1.2.3')
 			library('aws-lambda-events', 'com.amazonaws:aws-lambda-java-events:3.13.0')
 			library('aws-lambda-log4j', 'com.amazonaws:aws-lambda-java-log4j2:1.6.0')
-
+			library('aws-lambda-serialization', 'com.amazonaws:aws-lambda-java-serialization:1.1.2')
+			
 			library('bytebuddy', 'net.bytebuddy:byte-buddy:1.14.19')
 
 			library('classgraph', 'io.github.classgraph:classgraph:4.8.174')

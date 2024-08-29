@@ -1,11 +1,10 @@
 plugins {
-    id 'build.java-application'
+	id 'build.java-application'
 	id 'build.java-tests'
 }
 
 dependencies {
-    implementation project(':boot')
-	implementation libs.log4j.slf4j
+	implementation project(':boot')
 
 	testImplementation testFixtures(project(':boot'))
 	testImplementation project(':boot'), {
@@ -16,5 +15,5 @@ dependencies {
 }
 
 application {
-    mainClass = 'com.ascelion.demo.Application'
+	mainClass = 'com.ascelion.demo.Application'
 }

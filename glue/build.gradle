@@ -6,7 +6,10 @@ plugins {
 dependencies {
 	implementation project(':boot')
 
+	implementation libs.aws.lambda.serialization
+	implementation libs.classgraph
 	implementation libs.commons.io
+	implementation libs.commons.lang3
 
 	compileOnly 'com.amazonaws:aws-lambda-java-runtime-interface-client:2.3.2'
 

@@ -12,9 +12,9 @@ class Service {
 	private Context context;
 
 	@Inject
-	private SQSEvent request;
+	private SQSEvent event;
 
 	public void proceed() {
-		LOG.info("Got request {} in context {}", this.request, this.context.getAwsRequestId());
+		LOG.info("Got event with id {} as {}", this.context.getAwsRequestId(), this.event);
 	}
 }

@@ -8,14 +8,13 @@ dependencies {
 	implementation libs.aws.lambda.core
 	implementation libs.aws.lambda.events
 
+	runtimeOnly libs.log4j.slf4j
 	runtimeOnly libs.aws.lambda.log4j
 }
 
 tasks.register 'zip', Zip, {
-	into 'bin', {
-		from tasks.named('jar')
-	}
 	into 'lib', {
+		from tasks.named('jar')
 		from configurations.runtimeClasspath
 	}
 }

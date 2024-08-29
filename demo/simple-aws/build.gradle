@@ -5,7 +5,6 @@ plugins {
 
 dependencies {
 	implementation project(':boot')
-	implementation libs.log4j.slf4j
 
 	testImplementation testFixtures(project(':boot'))
 	testImplementation project(':boot'), {
@@ -22,6 +21,10 @@ dependencies {
 	}
 	integrationTestImplementation tests.tc.core
 	integrationTestImplementation tests.tc.localstack
+	integrationTestImplementation libs.aws.lambda.events
+	integrationTestImplementation libs.aws.lambda.serialization
+	integrationTestImplementation 'software.amazon.awssdk:lambda'
+	integrationTestImplementation 'software.amazon.awssdk:sqs'
 }
 
 tasks.named('integrationTest') {

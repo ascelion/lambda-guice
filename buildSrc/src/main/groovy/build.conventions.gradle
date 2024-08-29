@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.bundling.AbstractArchiveTask
+
 plugins {
 	id 'eclipse'
 	id 'lifecycle-base'
@@ -7,6 +9,10 @@ defaultTasks 'build'
 
 tasks.named 'clean', {
 	delete 'bin'
+}
+
+tasks.withType AbstractArchiveTask, {
+	archiveVersion = ''
 }
 
 subprojects {

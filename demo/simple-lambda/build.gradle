@@ -1,11 +1,10 @@
 plugins {
-    id 'build.java-lambda'
+	id 'build.java-lambda'
 	id 'build.java-tests'
 }
 
 dependencies {
-    implementation project(':boot')
-	implementation libs.log4j.slf4j
+	implementation project(':boot')
 
 	testImplementation testFixtures(project(':boot'))
 }

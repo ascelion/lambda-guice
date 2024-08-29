@@ -44,15 +44,15 @@ dependencies {
 	jupiterApi platform(tests.jupiter.bom)
 	jupiterApi tests.jupiter.api
 	jupiterApi tests.mockito.jupiter
+	jupiterApi tests.system.stubs.jupiter
 	jupiterImplementation sourceSets.testFixtures.output
-	jupiterImplementation tests.system.stubs.jupiter
 
 	testngApi platform(tests.jupiter.bom)
 	testngApi tests.jupiter.api
 	testngApi tests.testng
 	testngApi tests.mockito.testng
+	testngApi tests.system.stubs.testng
 	testngImplementation sourceSets.testFixtures.output
-	testngImplementation tests.system.stubs.testng
 }
 
 testing {

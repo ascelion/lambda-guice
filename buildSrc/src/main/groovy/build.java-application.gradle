@@ -1,5 +1,9 @@
 plugins {
 	id 'build.java-commons'
 
-    id 'application'
+	id 'application'
+}
+
+dependencies {
+	runtimeOnly libs.log4j.slf4j
 }
