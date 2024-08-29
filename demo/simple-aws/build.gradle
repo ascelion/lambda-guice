@@ -1,0 +1,31 @@
+plugins {
+    id 'build.java-lambda'
+	id 'build.java-tests'
+}
+
+dependencies {
+    implementation project(':boot')
+	implementation libs.log4j.slf4j
+
+	implementation 'com.amazonaws:aws-lambda-java-runtime-interface-client:2.3.2'
+
+	testImplementation testFixtures(project(':boot'))
+	testImplementation project(':boot'), {
+		capabilities {
+			requireCapability("${project.group}:boot-jupiter")
+		}
+	}
+
+	integrationTestImplementation testFixtures(project(':boot'))
+	integrationTestImplementation project(':boot'), {
+		capabilities {
+			requireCapability("${project.group}:boot-jupiter")
+		}
+	}
+	integrationTestImplementation tests.tc.core
+	integrationTestImplementation tests.tc.localstack
+}
+
+tasks.named('integrationTest') {
+	dependsOn 'zip'
+}

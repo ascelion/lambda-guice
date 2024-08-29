@@ -1,0 +1,25 @@
+plugins {
+	id 'build.java-commons'
+}
+
+dependencies {
+	deps platform(libs.aws.sdk.java2.bom)
+
+	implementation libs.aws.lambda.core
+	implementation libs.aws.lambda.events
+
+	runtimeOnly libs.aws.lambda.log4j
+}
+
+tasks.register 'zip', Zip, {
+	into 'bin', {
+		from tasks.named('jar')
+	}
+	into 'lib', {
+		from configurations.runtimeClasspath
+	}
+}
+
+tasks.named('assemble') {
+	dependsOn 'zip'
+}
