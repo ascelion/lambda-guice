@@ -2,4 +2,5 @@ com.ascelion.guice.module.AutoBindBeansModule
 com.ascelion.guice.module.AutoBindClassProvidersModule
 com.ascelion.guice.module.AutoBindFieldProducersModule
 com.ascelion.guice.module.AutoBindMethodProducersModule
+com.ascelion.guice.module.AutoBindScopeModule
 com.ascelion.guice.module.PostConstructModule

@@ -7,8 +7,7 @@ import static org.apache.commons.lang3.reflect.FieldUtils.getFieldsListWithAnnot
 import static org.apache.commons.lang3.reflect.MethodUtils.getMethodsListWithAnnotation;
 
 import com.ascelion.guice.internal.MemberProducer;
-import com.google.inject.Binder;
-import com.google.inject.Injector;
+import com.google.inject.*;
 import com.google.inject.Module;
 
 import java.lang.annotation.Annotation;
@@ -68,11 +67,11 @@ public final class GuiceMockStubsModule implements Module {
 	public void configure(Binder bnd) {
 		this.producerFields.forEach(field -> {
 			new MemberProducer(field, () -> this.instance, () -> this.injector)
-					.bind(bnd);
+					.bind(bnd, Scopes.NO_SCOPE);
 		});
 		this.producerMethods.forEach(method -> {
 			new MemberProducer(method, () -> this.instance, () -> this.injector)
-					.bind(bnd);
+					.bind(bnd, Scopes.NO_SCOPE);
 		});
 	}
 

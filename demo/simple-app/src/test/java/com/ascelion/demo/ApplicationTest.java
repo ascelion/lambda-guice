@@ -8,6 +8,7 @@ import com.ascelion.guice.test.BindProducer;
 import java.util.List;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -16,10 +17,12 @@ class ApplicationTest {
 
 	@BindProducer
 	@Arguments
+	@Singleton
 	final String[] args1 = { "test", "arguments" };
 
 	@BindProducer
 	@Arguments
+	@Singleton
 	final List<String> args2 = List.of(this.args1);
 
 	@Inject

@@ -1,11 +1,11 @@
 package com.ascelion.guice.internal;
 
 import com.google.inject.BindingAnnotation;
+import com.google.inject.ScopeAnnotation;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 import io.github.classgraph.ClassInfo;
@@ -44,8 +44,15 @@ public final class GuiceUtils {
 		return Stream.of(annotated.getAnnotations()).map(Annotation::annotationType).anyMatch(types::contains);
 	}
 
-	public static boolean isSingleton(AnnotatedElement annotated) {
-		return isAnnotatedWith(annotated, jakarta.inject.Singleton.class, com.google.inject.Singleton.class);
+	public static Optional<Class<? extends Annotation>> scopeAnnotation(AnnotatedElement annotated) {
+		if (annotated.isAnnotationPresent(jakarta.inject.Singleton.class)) {
+			return Optional.of(com.google.inject.Singleton.class);
+		}
+
+		return (Optional) Stream.of(annotated.getAnnotations())
+				.map(Annotation::annotationType)
+				.filter(it -> it.isAnnotationPresent(ScopeAnnotation.class))
+				.findFirst();
 	}
 
 	public static Annotation getBindingAnnotation(AnnotatedElement annotated) {

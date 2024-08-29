@@ -2,12 +2,11 @@ package com.ascelion.guice.module;
 
 import static com.ascelion.guice.ModulePriorities.MODULE_PRIORITY_OFFSET;
 import static com.ascelion.guice.ModulePriorities.PROVIDER_MODULE_PRIORITY;
-import static com.ascelion.guice.internal.GuiceUtils.isSingleton;
 import static com.ascelion.guice.internal.GuiceUtils.isVetoed;
 
 import com.ascelion.guice.internal.BootstrapContext;
 import com.google.inject.AbstractModule;
-import com.google.inject.Scopes;
+import com.google.inject.Scope;
 
 import io.github.classgraph.ClassInfo;
 import jakarta.annotation.Priority;
@@ -22,33 +21,24 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class AutoBindBeansModule extends AbstractModule {
-
 	@Inject
 	private BootstrapContext context;
 
 	@Override
 	protected void configure() {
-		final var classes = this.context.getScanned().getAllClasses()
+		final var classes = this.context.getScanned()
+				.getAllStandardClasses()
 				.filter(it -> !this.context.containsBean(it))
-				.filter(ClassInfo::isStandardClass)
 				.filter(ci -> !isVetoed(ci))
-				.filter(this::hasEligibleConstructor);
+				.filter(this::isEligible);
 
 		for (final var ci : classes) {
-			// TODO: what about custom scopes?
 			final Class target = ci.loadClass();
+			final Scope scope = this.context.getScope(target);
 
-			if (isSingleton(target)) {
-				LOG.debug("Binding singleton {} to itself", target.getName());
+			LOG.debug("Binding {} to itself in scope {}", target.getName(), scope);
 
-				bind(target).in(Scopes.SINGLETON);
-			} else {
-				LOG.debug("Binding {} to itself", target.getName());
-
-				bind(target);
-			}
-
-			this.context.addBean(target);
+			bind(target).in(scope);
 
 			if (ci.getInterfaces().size() != 1) {
 				continue;
@@ -64,20 +54,24 @@ public class AutoBindBeansModule extends AbstractModule {
 				continue;
 			}
 
-			if (isSingleton(target)) {
-				LOG.debug("Binding {} to singleton {}", itfc.getName(), target.getName());
+			LOG.debug("Binding {} to {} in scope {}", itfc.getName(), target.getName(), scope);
 
-				bind(itfc).to(target).in(Scopes.SINGLETON);
-			} else {
-				LOG.debug("Binding {} to {}", itfc.getName(), target.getName());
-
-				bind(itfc).to(target);
-			}
+			bind(itfc).to(target).in(scope);
 		}
 	}
 
-	private boolean hasEligibleConstructor(ClassInfo ci) {
-		return hasSimpleConstructor(ci) || hasInjectConstructor(ci);
+	private boolean isEligible(ClassInfo ci) {
+		if (isVetoed(ci)) {
+			return false;
+		}
+		if (hasSimpleConstructor(ci)) {
+			return true;
+		}
+		if (hasInjectConstructor(ci)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private boolean hasSimpleConstructor(ClassInfo ci) {

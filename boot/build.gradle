@@ -33,6 +33,7 @@ dependencies {
 	api libs.jakarta.cdi
 	api libs.jakarta.inject
 
+	implementation libs.bytebuddy
 	implementation libs.classgraph
 	implementation libs.commons.lang3
 

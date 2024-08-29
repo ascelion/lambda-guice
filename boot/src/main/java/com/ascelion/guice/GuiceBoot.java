@@ -1,12 +1,14 @@
 package com.ascelion.guice;
 
+import static java.lang.Thread.currentThread;
+import static java.util.Collections.sort;
+
 import com.google.inject.*;
 import com.google.inject.Module;
 import com.google.inject.util.Modules;
 
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.ServiceLoader.Provider;
 
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -38,30 +40,32 @@ public class GuiceBoot {
 		return getInjector().getInstance(type);
 	}
 
-	<T> T construct(T instance, Injector inj) {
-		inj.injectMembers(instance);
-
-		return instance;
-	}
-
 	private Injector createInjector() {
 		final var first = Guice.createInjector(Stage.PRODUCTION,
 				Binder::requireExplicitBindings,
 				this.init.buildInitModule());
 
-		final var allModules = new ArrayList<>(loadModules(first));
+		final var allModules = new ArrayList<>(loadModules());
 
 		allModules.addAll(this.modules);
 
-		Collections.sort(allModules, ModulePriorities::compareModules);
+		sort(allModules, ModulePriorities::compareModules);
 
-		return first.createChildInjector(Modules.override(allModules).with(this.overrides));
+		allModules.forEach(first::injectMembers);
+
+		final var ovrModules = new ArrayList<>(this.overrides);
+
+		sort(ovrModules, ModulePriorities::compareModules);
+
+		ovrModules.forEach(first::injectMembers);
+
+		return first.createChildInjector(Modules.override(allModules).with(ovrModules));
 	}
 
-	private List<Module> loadModules(Injector root) {
-		return ServiceLoader.load(Module.class).stream()
-				.map(Provider::get)
-				.map(mod -> construct(mod, root))
+	private List<Module> loadModules() {
+		return ServiceLoader.load(Module.class, currentThread().getContextClassLoader())
+				.stream()
+				.map(ServiceLoader.Provider::get)
 				.toList();
 	}
 

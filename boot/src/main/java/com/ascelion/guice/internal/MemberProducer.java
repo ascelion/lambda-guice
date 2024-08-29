@@ -1,7 +1,6 @@
 package com.ascelion.guice.internal;
 
 import static com.ascelion.guice.internal.GuiceUtils.getBindingAnnotation;
-import static com.ascelion.guice.internal.GuiceUtils.isSingleton;
 import static java.lang.reflect.Modifier.isStatic;
 
 import com.google.inject.*;
@@ -96,9 +95,8 @@ public class MemberProducer implements Provider {
 		this(injectorP, new MethodInvoker(method, instanceP, injectorP));
 	}
 
-	public void bind(Binder bnd) {
+	public void bind(Binder bnd, Scope scope) {
 		final var annotation = getBindingAnnotation((AnnotatedElement) this.invoker.member);
-		final var scope = isSingleton((AnnotatedElement) this.invoker.member) ? Scopes.SINGLETON : Scopes.NO_SCOPE;
 
 		if (annotation != null) {
 			LOG.atTrace()

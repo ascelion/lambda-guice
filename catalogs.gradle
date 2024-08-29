@@ -15,6 +15,8 @@ dependencyResolutionManagement {
 			library('aws-lambda-events', 'com.amazonaws:aws-lambda-java-events:3.13.0')
 			library('aws-lambda-log4j', 'com.amazonaws:aws-lambda-java-log4j2:1.6.0')
 
+			library('bytebuddy', 'net.bytebuddy:byte-buddy:1.14.19')
+
 			library('classgraph', 'io.github.classgraph:classgraph:4.8.174')
 
 			library('commons-collections4', 'org.apache.commons:commons-collections4:4.4')
@@ -37,6 +39,10 @@ dependencyResolutionManagement {
 
 			library('lombok', 'org.projectlombok:lombok:1.18.34')
 
+			version('picocli', '4.7.6')
+			library('picocli', 'info.picocli', 'picocli').versionRef('picocli')
+			library('picocli-codegen', 'info.picocli', 'picocli-codegen').versionRef('picocli')
+
 			library('slf4j-bom', 'org.slf4j:slf4j-bom:2.0.12')
 			library('slf4j-api', 'org.slf4j', 'slf4j-api').withoutVersion()
 		}
@@ -57,6 +63,10 @@ dependencyResolutionManagement {
 			library('system-stubs-core', 'uk.org.webcompere', 'system-stubs-core').versionRef('system-stubs')
 			library('system-stubs-jupiter', 'uk.org.webcompere', 'system-stubs-jupiter').versionRef('system-stubs')
 			library('system-stubs-testng', 'uk.org.webcompere', 'system-stubs-testng').versionRef('system-stubs')
+
+			version('tc', '1.20.1')
+			library('tc-core', 'org.testcontainers', 'testcontainers').versionRef('tc')
+			library('tc-localstack', 'org.testcontainers', 'localstack').versionRef('tc')
 
 			library('testng', 'org.testng:testng:7.10.2')
 		}

@@ -18,7 +18,3 @@ dependencies {
 application {
     mainClass = 'com.ascelion.demo.Application'
 }
-
-run {
-	args 'one', 'two'
-}

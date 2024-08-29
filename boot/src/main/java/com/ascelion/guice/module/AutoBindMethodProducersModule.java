@@ -28,7 +28,8 @@ public class AutoBindMethodProducersModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		final var classes = this.context.getScanned().getClassesWithMethodAnnotation(Produces.class)
+		final var classes = this.context.getScanned()
+				.getClassesWithMethodAnnotation(Produces.class)
 				.filter(it -> !this.context.containsBean(it));
 
 		for (final var ci : classes) {
@@ -39,7 +40,7 @@ public class AutoBindMethodProducersModule extends AbstractModule {
 				final Class target = method.getReturnType();
 
 				new MemberProducer(method, getProvider(source), getProvider(Injector.class))
-						.bind(binder());
+						.bind(binder(), this.context.getScope(method, target));
 
 				this.context.addBean(target);
 			}

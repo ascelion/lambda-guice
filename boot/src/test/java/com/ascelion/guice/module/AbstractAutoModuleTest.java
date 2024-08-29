@@ -1,7 +1,9 @@
 package com.ascelion.guice.module;
 
 import static com.ascelion.guice.GuiceBoot.guiceInit;
+import static java.util.Collections.sort;
 
+import com.ascelion.guice.ModulePriorities;
 import com.ascelion.guice.internal.BootstrapContext;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -26,14 +28,17 @@ public abstract class AbstractAutoModuleTest {
 			final var inj0 = Guice.createInjector(strict, ini.buildInitModule());
 			final List<Module> all = new ArrayList<>();
 
-			all.add(injectMembers(inj0, new AutoBindClassProvidersModule()));
-			all.add(injectMembers(inj0, new AutoBindMethodProducersModule()));
-			all.add(injectMembers(inj0, new AutoBindFieldProducersModule()));
 			all.add(injectMembers(inj0, new AutoBindBeansModule()));
+			all.add(injectMembers(inj0, new AutoBindClassProvidersModule()));
+			all.add(injectMembers(inj0, new AutoBindFieldProducersModule()));
+			all.add(injectMembers(inj0, new AutoBindMethodProducersModule()));
+			all.add(injectMembers(inj0, new AutoBindScopeModule()));
 
 			if (postConstruct) {
 				all.add(injectMembers(inj0, new PostConstructModule()));
 			}
+
+			sort(all, ModulePriorities::compareModules);
 
 			inj = inj0.createChildInjector(all);
 		} else {
@@ -41,14 +46,17 @@ public abstract class AbstractAutoModuleTest {
 			final List<Module> all = new ArrayList<>();
 
 			all.add(strict);
-			all.add(new AutoBindClassProvidersModule(ctx));
-			all.add(new AutoBindMethodProducersModule(ctx));
-			all.add(new AutoBindFieldProducersModule(ctx));
 			all.add(new AutoBindBeansModule(ctx));
+			all.add(new AutoBindClassProvidersModule(ctx));
+			all.add(new AutoBindFieldProducersModule(ctx));
+			all.add(new AutoBindMethodProducersModule(ctx));
+			all.add(new AutoBindScopeModule(ctx));
 
 			if (postConstruct) {
 				all.add(new PostConstructModule());
 			}
+
+			sort(all, ModulePriorities::compareModules);
 
 			inj = Guice.createInjector(all);
 		}
