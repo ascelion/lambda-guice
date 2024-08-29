@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class MemberProducer implements Provider {
 
-	private abstract static class Invoker<M extends Member> {
+	public abstract static class Invoker<M extends Member> {
 		final M member;
 		final Type type;
 		final Provider<?> instanceP;
@@ -37,8 +37,8 @@ public class MemberProducer implements Provider {
 		abstract Object get();
 	}
 
-	private static class FieldInvoker extends Invoker<Field> {
-		FieldInvoker(Field field, Provider<?> instanceP) {
+	public static class FieldInvoker extends Invoker<Field> {
+		public FieldInvoker(Field field, Provider<?> instanceP) {
 			super(field, field.getGenericType(), instanceP);
 		}
 
@@ -54,11 +54,11 @@ public class MemberProducer implements Provider {
 		}
 	}
 
-	private static class MethodInvoker extends Invoker<Method> {
+	public static class MethodInvoker extends Invoker<Method> {
 		final Class<?>[] types;
 		final Provider<Injector> injectorP;
 
-		MethodInvoker(Method method, Provider<?> instanceP, Provider<Injector> injectorP) {
+		public MethodInvoker(Method method, Provider<?> instanceP, Provider<Injector> injectorP) {
 			super(method, method.getGenericReturnType(), instanceP);
 
 			this.types = this.member.getParameterTypes();

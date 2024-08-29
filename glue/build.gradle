@@ -1,0 +1,25 @@
+plugins {
+	id 'build.java-lambda'
+	id 'build.java-tests'
+}
+
+dependencies {
+	implementation project(':boot')
+
+	implementation libs.commons.io
+
+	compileOnly 'com.amazonaws:aws-lambda-java-runtime-interface-client:2.3.2'
+
+	testImplementation testFixtures(project(':boot'))
+	testImplementation libs.commons.collections4
+	testImplementation project(':boot'), {
+		capabilities {
+			requireCapability("${project.group}:boot-jupiter")
+		}
+	}
+	testRuntimeOnly 'com.google.code.gson:gson:2.11.0'
+}
+
+tasks.named 'zip', {
+	enabled = false
+}

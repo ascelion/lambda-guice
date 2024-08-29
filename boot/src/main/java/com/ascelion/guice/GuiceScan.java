@@ -12,7 +12,19 @@ import java.lang.annotation.Target;
 @Target({ TYPE, FIELD, METHOD, CONSTRUCTOR, PARAMETER })
 @BindingAnnotation
 public @interface GuiceScan {
+
+	/**
+	 * Same as {@link #classes()}.
+	 */
+	Class<?>[] value() default {};
+
 	Class<?>[] classes() default {};
 
+	String[] classNames() default {};
+
 	Class<?>[] packages() default {};
+
+	String[] packageNames() default {};
+
+	Class<?>[] excluded() default {};
 }

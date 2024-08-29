@@ -15,7 +15,7 @@ import jakarta.inject.Provider;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
-@Priority(PROVIDER_MODULE_PRIORITY + 2 * MODULE_PRIORITY_OFFSET)
+@Priority(PROVIDER_MODULE_PRIORITY + 3 * MODULE_PRIORITY_OFFSET)
 @SuppressWarnings({ "rawtypes" })
 @Slf4j
 @NoArgsConstructor

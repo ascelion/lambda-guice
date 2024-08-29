@@ -44,8 +44,7 @@ public final class GuiceMockStubsModule implements Module {
 				.toList();
 
 		final var init = guiceInit(this.type)
-				.exclude(this.type)
-				.classes(this.type.getDeclaredClasses());
+				.excluded(this.type);
 
 		this.producerFields.forEach(field -> init.classes(field.getType()));
 		this.producerMethods.forEach(methods -> init.classes(methods.getReturnType()));

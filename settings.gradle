@@ -4,6 +4,7 @@ rootProject.name = 'lambda-guice'
 
 include 'bom'
 include 'boot'
+include 'glue'
 
 include 'demo:request-app'
 include 'demo:simple-app'

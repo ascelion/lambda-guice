@@ -41,25 +41,34 @@ public class GuiceBoot {
 	}
 
 	private Injector createInjector() {
-		final var first = Guice.createInjector(Stage.PRODUCTION,
-				Binder::requireExplicitBindings,
-				this.init.buildInitModule());
-
 		final var allModules = new ArrayList<>(loadModules());
 
 		allModules.addAll(this.modules);
 
-		sort(allModules, ModulePriorities::compareModules);
-
-		allModules.forEach(first::injectMembers);
+		visitModules(allModules);
 
 		final var ovrModules = new ArrayList<>(this.overrides);
 
-		sort(ovrModules, ModulePriorities::compareModules);
+		visitModules(ovrModules);
 
+		final var first = Guice.createInjector(Stage.PRODUCTION,
+				Binder::requireExplicitBindings,
+				this.init.buildInitModule());
+
+		allModules.forEach(first::injectMembers);
 		ovrModules.forEach(first::injectMembers);
 
 		return first.createChildInjector(Modules.override(allModules).with(ovrModules));
+	}
+
+	private void visitModules(final java.util.ArrayList<com.google.inject.Module> modules) {
+		sort(modules, ModulePriorities::compareModules);
+
+		for (final var it : modules) {
+			final var cl = it.getClass();
+
+			this.init.classes(cl).excluded(cl);
+		}
 	}
 
 	private List<Module> loadModules() {

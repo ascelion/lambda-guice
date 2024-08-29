@@ -11,8 +11,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import jakarta.enterprise.inject.Vetoed;
@@ -44,38 +44,40 @@ public class RequestScope implements Scope {
 			this.values.putAll(parent.values);
 		}
 
-		public <T> Request seed(Class<T> type, T instance) {
+		public <T> Request seed(Class<? extends T> type, T instance) {
 			return seed(Key.get(type), instance);
 		}
 
-		public <T> Request seed(Key<T> type, T o) {
+		public <T> Request seed(Key<? extends T> type, T o) {
 			this.values.put(type, o);
 
 			return this;
 		}
 
 		public void proceed(Runnable action) {
-			proceed(() -> {
+			try {
 				action.run();
-
-				return null;
-			});
+			} finally {
+				REQUESTS.remove();
+			}
 		}
 
-		public <T> T proceed(Supplier<T> action) {
+		public <T> T proceed(Callable<T> action) throws Exception {
 			try {
-				return action.get();
+				return action.call();
 			} finally {
 				REQUESTS.remove();
 			}
 		}
 
 		<T> T get(Key<T> key, com.google.inject.Provider<T> unscoped) {
-			return (T) this.values.computeIfAbsent(key, k -> {
+			if (!this.values.containsKey(key)) {
 				LOG.trace("Unscoped {}", key);
 
-				return unscoped.get();
-			});
+				this.values.put(key, unscoped.get());
+			}
+
+			return (T) this.values.get(key);
 		}
 	}
 
@@ -133,7 +135,6 @@ public class RequestScope implements Scope {
 
 			Files.write(path, unloaded.getBytes());
 		} catch (final IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -193,7 +194,9 @@ public class RequestScope implements Scope {
 			throw new IllegalStateException("Scope is not active");
 		}
 
-		return method.invoke(request.get(key, unscoped), args);
+		final var instance = request.get(key, unscoped);
+
+		return method.invoke(instance, args);
 	}
 
 }

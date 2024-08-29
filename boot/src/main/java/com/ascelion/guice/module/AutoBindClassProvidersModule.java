@@ -1,5 +1,6 @@
 package com.ascelion.guice.module;
 
+import static com.ascelion.guice.ModulePriorities.MODULE_PRIORITY_OFFSET;
 import static com.ascelion.guice.ModulePriorities.PROVIDER_MODULE_PRIORITY;
 
 import com.ascelion.guice.internal.BootstrapContext;
@@ -17,7 +18,7 @@ import jakarta.inject.Provider;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
-@Priority(PROVIDER_MODULE_PRIORITY)
+@Priority(PROVIDER_MODULE_PRIORITY + MODULE_PRIORITY_OFFSET)
 @SuppressWarnings({ "rawtypes" })
 @Slf4j
 @NoArgsConstructor

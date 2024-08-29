@@ -13,6 +13,7 @@ javaPlatform {
 dependencies {
 	constraints {
 		api project(':boot')
+		api project(':glue')
 	}
 }
 
