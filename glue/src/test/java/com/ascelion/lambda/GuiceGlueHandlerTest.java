@@ -7,6 +7,7 @@ import static java.lang.Thread.currentThread;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.toEncodedString;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.Mockito.*;
@@ -27,7 +28,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.NullInputStream;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -226,9 +226,9 @@ class GuiceGlueHandlerTest {
 
 		assertThatNoException().isThrownBy(() -> glue.handleRequest(new NullInputStream(), this.output, this.context));
 
-		final var text = StringUtils.toEncodedString(this.output.toByteArray(), UTF_8);
+		final var text = toEncodedString(this.output.toByteArray(), UTF_8);
 
-		assertThat(text).isEqualTo("HIHI");
+		assertThatJson(text).isString().isEqualTo("HIHI");
 	}
 
 	@Test
@@ -249,7 +249,7 @@ class GuiceGlueHandlerTest {
 
 		assertThatNoException().isThrownBy(() -> glue.handleRequest(new NullInputStream(), this.output, this.context));
 
-		final var text = StringUtils.toEncodedString(this.output.toByteArray(), UTF_8);
+		final var text = toEncodedString(this.output.toByteArray(), UTF_8);
 
 		assertThat(text).isEqualTo("HOHO");
 	}
@@ -265,7 +265,7 @@ class GuiceGlueHandlerTest {
 
 		assertThatNoException().isThrownBy(() -> glue.handleRequest(iJson, this.output, this.context));
 
-		final var oJson = StringUtils.toEncodedString(this.output.toByteArray(), UTF_8);
+		final var oJson = toEncodedString(this.output.toByteArray(), UTF_8);
 
 		assertThatJson(oJson).isObject().containsEntry("value", "HIHI");
 	}
@@ -284,8 +284,8 @@ class GuiceGlueHandlerTest {
 
 		assertThatNoException().isThrownBy(() -> glue.handleRequest(input, this.output, this.context));
 
-		final var iJson = StringUtils.toEncodedString(inputBuf.toByteArray(), UTF_8);
-		final var oJson = StringUtils.toEncodedString(this.output.toByteArray(), UTF_8);
+		final var iJson = toEncodedString(inputBuf.toByteArray(), UTF_8);
+		final var oJson = toEncodedString(this.output.toByteArray(), UTF_8);
 
 		assertThatJson(iJson).isEqualTo(oJson);
 	}
@@ -304,7 +304,7 @@ class GuiceGlueHandlerTest {
 
 		assertThatNoException().isThrownBy(() -> glue.handleRequest(input, this.output, this.context));
 
-		final var oJson = StringUtils.toEncodedString(this.output.toByteArray(), UTF_8);
+		final var oJson = toEncodedString(this.output.toByteArray(), UTF_8);
 
 		assertThatJson(oJson).isObject().containsEntry("region", event.getRecords().get(0).getAwsRegion());
 	}
@@ -324,7 +324,7 @@ class GuiceGlueHandlerTest {
 
 		assertThatNoException().isThrownBy(() -> glue.handleRequest(input, this.output, this.context));
 
-		final var oJson = StringUtils.toEncodedString(this.output.toByteArray(), UTF_8);
+		final var oJson = toEncodedString(this.output.toByteArray(), UTF_8);
 
 		assertThatJson(oJson).isObject().containsEntry("region", event.getRecords().get(0).getAwsRegion());
 	}

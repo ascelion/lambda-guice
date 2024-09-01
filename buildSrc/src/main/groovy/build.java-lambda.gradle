@@ -1,15 +1,6 @@
 plugins {
 	id 'build.java-commons'
-}
-
-dependencies {
-	deps platform(libs.aws.sdk.java2.bom)
-
-	runtimeOnly libs.log4j.slf4j
-
-	compileOnly libs.aws.lambda.core
-	compileOnly libs.aws.lambda.events
-	compileOnly libs.aws.lambda.log4j
+	id 'build.java-lambda-deps'
 }
 
 testing {
@@ -24,7 +15,7 @@ testing {
 	}
 }
 
-tasks.register 'zip', Zip, {
+def zipTask = tasks.register 'zip', Zip, {
 	into 'lib', {
 		from tasks.named('jar')
 		from configurations.runtimeClasspath
@@ -32,5 +23,11 @@ tasks.register 'zip', Zip, {
 }
 
 tasks.named('assemble') {
-	dependsOn 'zip'
+	dependsOn zipTask
+}
+
+tasks.register 'aws', Exec, {
+	dependsOn zipTask
+
+	executable 'aws'
 }

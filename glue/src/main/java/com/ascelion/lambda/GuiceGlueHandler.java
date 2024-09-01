@@ -3,8 +3,6 @@ package com.ascelion.lambda;
 import static com.amazonaws.services.lambda.runtime.serialization.events.LambdaEventSerializers.serializerFor;
 import static com.ascelion.guice.GuiceBoot.guiceInit;
 import static java.lang.Thread.currentThread;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.apache.commons.io.IOUtils.write;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
@@ -67,9 +65,7 @@ public final class GuiceGlueHandler implements RequestStreamHandler {
 					.seed(LambdaRequest.class, request)
 					.proceed(this::call);
 
-			if (response instanceof final String s) {
-				write(s, output, UTF_8);
-			} else if (response != null) {
+			if (response != null) {
 				this.serializer.toJson(response, output);
 			}
 		} catch (final IOException e) {

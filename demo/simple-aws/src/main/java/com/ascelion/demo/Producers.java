@@ -8,7 +8,7 @@ import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Singleton;
 
 @Singleton
-class AwsEvents {
+class Producers {
 
 	@Produces
 	@RequestScoped

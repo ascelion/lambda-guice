@@ -31,6 +31,10 @@ lombok {
 dependencies {
 	deps libs.slf4j.api
 
+	deps libs.jakarta.annotation
+	deps libs.jakarta.cdi
+	deps libs.jakarta.inject
+
 	deps libs.commons.io
 	deps libs.commons.lang3
 	deps libs.commons.collections4

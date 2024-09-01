@@ -1,0 +1,18 @@
+
+dependencies {
+	deps platform(libs.aws.sdk.java2.bom)
+
+	constraints {
+		deps libs.aws.lambda.core
+		deps libs.aws.lambda.events
+		deps libs.aws.lambda.log4j
+		deps libs.aws.lambda.serialization
+	}
+
+	implementation libs.aws.lambda.core
+	implementation libs.aws.lambda.events
+	implementation libs.aws.lambda.log4j
+	implementation libs.aws.lambda.serialization
+
+	runtimeOnly libs.log4j.slf4j
+}

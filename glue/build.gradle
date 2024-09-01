@@ -1,18 +1,12 @@
 plugins {
-	id 'java-library'
-	id 'build.java-lambda'
+	id 'build.java-library'
+	id 'build.java-lambda-deps'
 }
 
 dependencies {
-	api libs.jakarta.annotation
-	api libs.jakarta.cdi
-	api libs.jakarta.inject
+	api project(':boot')
 
-	implementation project(':boot')
 	implementation libs.classgraph
-
-	compileOnly libs.aws.lambda.serialization
-	compileOnly libs.aws.lambda.ric
 
 	testImplementation testFixtures(project(':boot'))
 	testImplementation project(':boot'), {
@@ -20,8 +14,5 @@ dependencies {
 			requireCapability("${project.group}:boot-jupiter")
 		}
 	}
-}
-
-tasks.named 'zip', {
-	enabled = false
+	testImplementation libs.aws.lambda.tests
 }

@@ -5,10 +5,7 @@ import static java.util.Comparator.comparing;
 
 import com.google.inject.*;
 
-import java.io.IOException;
 import java.lang.reflect.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -127,16 +124,16 @@ public class RequestScope implements Scope {
 				.intercept(InvocationHandlerAdapter.of((proxy, method, args) -> scoped(key, method, args, unscoped)))
 				.make();
 
-		try {
-			final var path = Path.of("build/generated/proxy-classes",
-					unloaded.getTypeDescription().getInternalName() + ".class");
-
-			path.getParent().toFile().mkdirs();
-
-			Files.write(path, unloaded.getBytes());
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			final var path = Path.of("build/generated/proxy-classes",
+//					unloaded.getTypeDescription().getInternalName() + ".class");
+//
+//			path.getParent().toFile().mkdirs();
+//
+//			Files.write(path, unloaded.getBytes());
+//		} catch (final IOException e) {
+//			e.printStackTrace();
+//		}
 
 		final var loaded = unloaded
 				.load(currentThread().getContextClassLoader())

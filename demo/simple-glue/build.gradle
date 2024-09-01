@@ -11,4 +11,14 @@ dependencies {
 			requireCapability("${project.group}:boot-jupiter")
 		}
 	}
+
+	integrationTestImplementation project(':glue')
+	integrationTestImplementation tests.tc.core
+	integrationTestImplementation tests.tc.localstack
+
+	integrationTestImplementation 'software.amazon.awssdk:lambda'
+}
+
+tasks.named('integrationTest') {
+	dependsOn 'zip'
 }

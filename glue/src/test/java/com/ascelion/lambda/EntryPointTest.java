@@ -27,6 +27,16 @@ class EntryPointTest {
 		}
 	}
 
+	static class HandlerWithMethod3 {
+		static void invoke1() {
+			throw new UnsupportedOperationException();
+		}
+
+		void invoke2() {
+			throw new UnsupportedOperationException();
+		}
+	}
+
 	static class HandlerCallable implements Callable<Void> {
 		@Override
 		public Void call() throws Exception {
@@ -58,6 +68,7 @@ class EntryPointTest {
 	@CsvSource({
 			"HandlerWithMethod1,invoke",
 			"HandlerWithMethod2,invoke2",
+			"HandlerWithMethod3,invoke2",
 			"HandlerCallable,call",
 			"HandlerRunnable,run",
 			"HandlerCallableAndRunnable,call"

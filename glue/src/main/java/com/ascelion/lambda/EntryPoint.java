@@ -12,6 +12,7 @@ import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
@@ -51,6 +52,7 @@ final class EntryPoint {
 	private static Method selectMethod(Class<?> clazz, String methodName, String handler) {
 		List<Method> methods = Stream.of(clazz.getDeclaredMethods())
 				.filter(m -> !m.isBridge() && !m.isSynthetic())
+				.filter(m -> (m.getModifiers() & (Modifier.STATIC | Modifier.ABSTRACT | Modifier.NATIVE)) == 0)
 				.toList();
 
 		if (methodName != null) {

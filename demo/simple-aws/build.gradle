@@ -12,15 +12,8 @@ dependencies {
 		}
 	}
 
-	integrationTestImplementation testFixtures(project(':boot'))
-	integrationTestImplementation project(':boot'), {
-		capabilities {
-			requireCapability("${project.group}:boot-jupiter")
-		}
-	}
 	integrationTestImplementation tests.tc.core
 	integrationTestImplementation tests.tc.localstack
-	integrationTestImplementation libs.aws.lambda.serialization
 
 	integrationTestImplementation 'software.amazon.awssdk:lambda'
 	integrationTestImplementation 'software.amazon.awssdk:sqs'
