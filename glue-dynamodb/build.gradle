@@ -1,0 +1,21 @@
+plugins {
+	id 'build.java-library'
+	id 'build.java-lambda-deps'
+}
+
+dependencies {
+	implementation project(':boot')
+	implementation libs.classgraph
+	implementation libs.geantyref
+
+	api 'software.amazon.awssdk:dynamodb'
+	api 'software.amazon.awssdk:dynamodb-enhanced'
+
+	testImplementation testFixtures(project(':boot'))
+	testImplementation project(':boot'), {
+		capabilities {
+			requireCapability("${project.group}:boot-jupiter")
+		}
+	}
+	testImplementation libs.aws.lambda.tests
+}

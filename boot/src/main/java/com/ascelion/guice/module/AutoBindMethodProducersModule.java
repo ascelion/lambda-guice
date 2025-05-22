@@ -28,9 +28,7 @@ public class AutoBindMethodProducersModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		final var classes = this.context.getScanned()
-				.getClassesWithMethodAnnotation(Produces.class)
-				.filter(it -> !this.context.containsBean(it));
+		final var classes = this.context.getClassesWithMethodAnnotation(Produces.class);
 
 		for (final var ci : classes) {
 			final Class source = ci.loadClass();

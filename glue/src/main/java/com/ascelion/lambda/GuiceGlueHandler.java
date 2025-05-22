@@ -3,6 +3,7 @@ package com.ascelion.lambda;
 import static com.amazonaws.services.lambda.runtime.serialization.events.LambdaEventSerializers.serializerFor;
 import static com.ascelion.guice.GuiceBoot.guiceInit;
 import static java.lang.Thread.currentThread;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
@@ -18,6 +19,7 @@ import java.util.stream.Stream;
 
 import jakarta.enterprise.inject.Vetoed;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 
 @Vetoed
 @Slf4j
@@ -60,7 +62,7 @@ public final class GuiceGlueHandler implements RequestStreamHandler {
 	@Override
 	public void handleRequest(InputStream input, OutputStream output, Context context) throws IOException {
 		try {
-			final var request = new LambdaRequestImpl(input, output, context);
+			final var request = createRequest(input, output, context);
 			final var response = this.scope.activate()
 					.seed(LambdaRequest.class, request)
 					.proceed(this::call);
@@ -73,6 +75,21 @@ public final class GuiceGlueHandler implements RequestStreamHandler {
 		} catch (final Exception e) {
 			throw new GuiceGlueException("Invocation failure", e);
 		}
+	}
+
+	private LambdaRequestImpl createRequest(InputStream input, OutputStream output, Context context)
+			throws IOException {
+		if (LOG.isTraceEnabled()) {
+			final String buf = IOUtils.toString(input, UTF_8);
+
+			LOG.trace("Got input {}", buf);
+
+			input = new ByteArrayInputStream(buf.getBytes(UTF_8));
+		}
+
+		final var request = new LambdaRequestImpl(input, output, context);
+
+		return request;
 	}
 
 	private Object call() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {

@@ -34,21 +34,14 @@ class GlueServiceIT {
 	static final String LOCAL_STACK_VERSION = System.getProperty("localstack.version", "3.6");
 	static final DockerImageName LOCAL_STACK_IMAGE = DockerImageName
 			.parse("localstack/localstack:" + LOCAL_STACK_VERSION);
-	static final String REUSE_CF = TestcontainersConfiguration.getInstance()
-			.getEnvVarOrUserProperty("testcontainers.reuse.enable", "");
+	static final boolean REUSE_CF = "true".equals(TestcontainersConfiguration.getInstance()
+			.getEnvVarOrUserProperty("testcontainers.reuse.enable", ""));
 
 	static final String LAMBDA_HANDLER = com.ascelion.lambda.GuiceGlueHandler.class.getName() + "::handleRequest";
 	static final Region LAMBDA_REGION = Region.EU_CENTRAL_1;
 	static final String LAMBDA_FUNCTION = "simple-glue";
 
-	static final String REQUEST_JSON = """
-			{
-				"operands": [
-					3.141592653589793,
-					2.718281828459045
-				]
-			}
-			""";
+	static final String REQUEST_JSON = "{\"body\":\"{\\\"operands\\\":[3.141592653589793,2.718281828459045]}\"}";
 
 	private LocalStackContainer container;
 
@@ -56,9 +49,13 @@ class GlueServiceIT {
 	@BeforeAll
 	void beforeAll() {
 		this.container = new LocalStackContainer(LOCAL_STACK_IMAGE)
-				.withReuse("true".equals(REUSE_CF))
+				.withReuse(REUSE_CF)
 				.withEnv("DEPLOY_VERBOSE", "true")
 				.withServices(Service.CLOUDWATCHLOGS, Service.LAMBDA, Service.SQS);
+
+		if (!REUSE_CF) {
+			this.container.addExposedPorts(4566);
+		}
 
 		this.container.start();
 		this.container.followOutput(f -> LOG.info("{}", f.getUtf8StringWithoutLineEnding()));

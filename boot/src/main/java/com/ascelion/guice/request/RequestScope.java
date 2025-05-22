@@ -1,11 +1,17 @@
 package com.ascelion.guice.request;
 
+import static com.ascelion.guice.internal.GuiceUtils.GENERATED_OUTPUT_DIRECTORY_PARAM;
+import static com.ascelion.guice.internal.GuiceUtils.externalConfiguration;
 import static java.lang.Thread.currentThread;
 import static java.util.Comparator.comparing;
+import static net.bytebuddy.matcher.ElementMatchers.isDeclaredBy;
 
 import com.google.inject.*;
 
+import java.io.IOException;
 import java.lang.reflect.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -17,13 +23,15 @@ import jakarta.inject.Provider;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.NamingStrategy;
 import net.bytebuddy.implementation.InvocationHandlerAdapter;
-import net.bytebuddy.matcher.ElementMatchers;
 
 @RequestScoped
 @Slf4j
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class RequestScope implements Scope {
+	private final String generatedDirectory = externalConfiguration(GENERATED_OUTPUT_DIRECTORY_PARAM).orElse(null);
+
 	private static final ThreadLocal<Request> REQUESTS = new InheritableThreadLocal<>() {
 		@Override
 		protected Request childValue(Request parent) {
@@ -79,7 +87,6 @@ public class RequestScope implements Scope {
 	}
 
 	private final Map<Key<?>, Object> proxies = new ConcurrentHashMap<>();
-
 	private final Provider<Injector> injectorP;
 
 	public Request activate() {
@@ -117,23 +124,25 @@ public class RequestScope implements Scope {
 	private <T> T proxy(Key<T> key, com.google.inject.Provider<T> unscoped) {
 		final var type = key.getTypeLiteral().getRawType();
 		final var unloaded = new ByteBuddy()
+				.with(new NamingStrategy.Suffixing("Proxy"))
 				.subclass(type)
-				.name(type.getName() + "$Proxy")
 				.annotateType(Vetoed.Literal.INSTANCE)
-				.method(ElementMatchers.isDeclaredBy(type))
+				.method(isDeclaredBy(type))
 				.intercept(InvocationHandlerAdapter.of((proxy, method, args) -> scoped(key, method, args, unscoped)))
 				.make();
 
-//		try {
-//			final var path = Path.of("build/generated/proxy-classes",
-//					unloaded.getTypeDescription().getInternalName() + ".class");
-//
-//			path.getParent().toFile().mkdirs();
-//
-//			Files.write(path, unloaded.getBytes());
-//		} catch (final IOException e) {
-//			e.printStackTrace();
-//		}
+		if (this.generatedDirectory != null) {
+			final var path = Path.of(this.generatedDirectory,
+					unloaded.getTypeDescription().getInternalName() + ".class");
+
+			try {
+				path.getParent().toFile().mkdirs();
+
+				Files.write(path, unloaded.getBytes());
+			} catch (final IOException e) {
+				LOG.warn("{}: {}", path, e);
+			}
+		}
 
 		final var loaded = unloaded
 				.load(currentThread().getContextClassLoader())

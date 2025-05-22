@@ -2,6 +2,7 @@ package com.ascelion.guice.test;
 
 import static com.ascelion.guice.GuiceBoot.guiceInit;
 import static com.ascelion.guice.internal.GuiceUtils.isAnnotatedWith;
+import static java.util.Collections.emptyList;
 import static org.apache.commons.lang3.reflect.FieldUtils.getAllFieldsList;
 import static org.apache.commons.lang3.reflect.FieldUtils.getFieldsListWithAnnotation;
 import static org.apache.commons.lang3.reflect.MethodUtils.getMethodsListWithAnnotation;
@@ -16,6 +17,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import jakarta.enterprise.inject.Vetoed;
+import jakarta.inject.Inject;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +31,9 @@ public final class GuiceMockStubsModule implements Module {
 	private final List<Field> producerFields;
 	private final List<Method> producerMethods;
 	private final List<Field> stubs;
-	private final Injector injector;
+
+	@Inject
+	private Injector injector;
 
 	public GuiceMockStubsModule(@NonNull Object instance, Class<? extends Annotation> stubAnnotation) {
 		this.instance = instance;
@@ -38,10 +42,14 @@ public final class GuiceMockStubsModule implements Module {
 		this.producerFields = getFieldsListWithAnnotation(this.type, BindProducer.class);
 		this.producerMethods = getMethodsListWithAnnotation(this.type, BindProducer.class, true, true);
 
-		this.stubs = getAllFieldsList(instance.getClass()).stream()
-				.filter(f -> isAnnotatedWith(f, stubAnnotation))
-				.filter(f -> TestResource.class.isAssignableFrom(f.getType()))
-				.toList();
+		if (stubAnnotation != null) {
+			this.stubs = getAllFieldsList(instance.getClass()).stream()
+					.filter(f -> isAnnotatedWith(f, stubAnnotation))
+					.filter(f -> TestResource.class.isAssignableFrom(f.getType()))
+					.toList();
+		} else {
+			this.stubs = emptyList();
+		}
 
 		final var init = guiceInit(this.type)
 				.excluded(this.type);
@@ -58,8 +66,7 @@ public final class GuiceMockStubsModule implements Module {
 		}
 
 		init.overrides(this);
-
-		this.injector = init.boot();
+		init.boot(this);
 	}
 
 	@Override

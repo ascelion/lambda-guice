@@ -28,9 +28,7 @@ public class AutoBindFieldProducersModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		final var classes = this.context.getScanned()
-				.getClassesWithFieldAnnotation(Produces.class)
-				.filter(it -> !this.context.containsBean(it));
+		final var classes = this.context.getClassesWithFieldAnnotation(Produces.class);
 
 		for (final var ci : classes) {
 			final Class source = ci.loadClass();

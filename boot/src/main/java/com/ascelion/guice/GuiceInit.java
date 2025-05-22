@@ -95,7 +95,11 @@ public class GuiceInit {
 				.rejectClasses(this.excluded.toArray(String[]::new))
 				.acceptClasses(this.classes.toArray(String[]::new))
 				.acceptPackages(this.packages.toArray(String[]::new))
-				.enableAllInfo().scan();
+				.ignoreFieldVisibility()
+				.ignoreMethodVisibility()
+				.ignoreClassVisibility()
+				.enableAllInfo()
+				.scan();
 	}
 
 	public Injector boot() {

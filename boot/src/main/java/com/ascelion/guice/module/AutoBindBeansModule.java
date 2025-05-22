@@ -2,13 +2,11 @@ package com.ascelion.guice.module;
 
 import static com.ascelion.guice.ModulePriorities.MODULE_PRIORITY_OFFSET;
 import static com.ascelion.guice.ModulePriorities.PROVIDER_MODULE_PRIORITY;
-import static com.ascelion.guice.internal.GuiceUtils.isVetoed;
 
 import com.ascelion.guice.internal.BootstrapContext;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scope;
 
-import io.github.classgraph.ClassInfo;
 import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
@@ -26,11 +24,7 @@ public class AutoBindBeansModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		final var classes = this.context.getScanned()
-				.getAllStandardClasses()
-				.filter(it -> !this.context.containsBean(it))
-				.filter(ci -> !isVetoed(ci))
-				.filter(this::isEligible);
+		final var classes = this.context.getAllStandardClasses();
 
 		for (final var ci : classes) {
 			final Class target = ci.loadClass();
@@ -58,32 +52,5 @@ public class AutoBindBeansModule extends AbstractModule {
 
 			bind(itfc).to(target).in(scope);
 		}
-	}
-
-	private boolean isEligible(ClassInfo ci) {
-		if (isVetoed(ci)) {
-			return false;
-		}
-		if (hasSimpleConstructor(ci)) {
-			return true;
-		}
-		if (hasInjectConstructor(ci)) {
-			return true;
-		}
-
-		return false;
-	}
-
-	private boolean hasSimpleConstructor(ClassInfo ci) {
-		return ci.getDeclaredConstructorInfo()
-				.filter(mi -> mi.getParameterInfo().length == 0)
-				.size() == 1;
-	}
-
-	private boolean hasInjectConstructor(ClassInfo ci) {
-		return ci.getDeclaredConstructorInfo()
-				.filter(mi -> mi.hasAnnotation(jakarta.inject.Inject.class)
-						|| mi.hasAnnotation(com.google.inject.Inject.class))
-				.size() == 1;
 	}
 }
