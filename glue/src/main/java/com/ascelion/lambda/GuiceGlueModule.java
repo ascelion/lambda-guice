@@ -9,6 +9,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import com.ascelion.guice.GuiceScan;
 import com.ascelion.guice.ModulePriorities;
 import com.ascelion.guice.internal.BootstrapContext;
+import com.ascelion.guice.internal.GuiceUtils;
 import com.ascelion.guice.request.RequestScope;
 import com.ascelion.guice.request.RequestScoped;
 import com.google.inject.*;
@@ -17,6 +18,8 @@ import io.github.classgraph.ClassInfo;
 import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.core.SdkSystemSetting;
+import software.amazon.awssdk.regions.Region;
 
 @Priority(ModulePriorities.PROVIDER_MODULE_PRIORITY)
 @GuiceScan(packageNames = GuiceGlueModule.LAMBDA_EVENTS_PACKAGE, classes = {
@@ -31,8 +34,7 @@ public final class GuiceGlueModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		this.context.getScanned()
-				.getAllStandardClasses()
+		this.context.getAllStandardClasses()
 				.filter(ci -> LAMBDA_EVENTS_PACKAGE.equals(ci.getPackageName())
 						|| ci.getPackageName().startsWith(LAMBDA_EVENTS_PACKAGE + "."))
 				.stream()
@@ -57,8 +59,23 @@ public final class GuiceGlueModule extends AbstractModule {
 		return () -> {
 			final LambdaRequest request = injectorP.get().getInstance(LambdaRequest.class);
 
-			return serializer.fromJson(request.getInput());
+			try {
+				return serializer.fromJson(request.getInput());
+			} catch (final RuntimeException e) {
+				LOG.error("Cannot deserialize input", e);
+
+				throw e;
+			}
 		};
+	}
+
+	@Provides
+	@Singleton
+	Region region() {
+		return GuiceUtils.externalConfiguration(SdkSystemSetting.AWS_REGION.property())
+				.map(Region::of)
+				.orElse(Region.EU_CENTRAL_1);
+
 	}
 
 	@Provides

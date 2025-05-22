@@ -1,0 +1,24 @@
+import java.util.function.Consumer
+
+plugins {
+	id 'build.java-library'
+	id 'build.java-lambda-deps'
+}
+
+dependencies {
+	implementation project(':boot')
+
+	implementation libs.bytebuddy
+	implementation libs.classgraph
+
+	api 'software.amazon.awssdk:s3'
+	api 'software.amazon.awssdk:s3control'
+
+	testImplementation testFixtures(project(':boot'))
+	testImplementation project(':boot'), {
+		capabilities {
+			requireCapability("${project.group}:boot-jupiter")
+		}
+	}
+	testImplementation libs.aws.lambda.tests
+}

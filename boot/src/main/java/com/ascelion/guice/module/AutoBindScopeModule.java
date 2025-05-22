@@ -30,8 +30,7 @@ public class AutoBindScopeModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		final ClassInfoList classes = this.context.getScanned()
-				.getClassesImplementing(Scope.class);
+		final ClassInfoList classes = this.context.getClassesImplementing(Scope.class);
 
 		for (final ClassInfo ci : classes) {
 			final Class<Scope> cl = ci.loadClass(Scope.class);

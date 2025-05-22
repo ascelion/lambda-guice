@@ -1,0 +1,28 @@
+
+plugins {
+	id 'build.java-lambda'
+}
+
+dependencies {
+	implementation project(':glue')
+	implementation project(':glue-dynamodb')
+	implementation project(':glue-s3')
+	
+	implementation 'software.amazon.awssdk:apache-client'
+	implementation 'software.amazon.awssdk:ses'
+	implementation 'software.amazon.awssdk:sns'
+
+	implementation libs.mapstruct
+	annotationProcessor libs.mapstruct.processor
+
+	testImplementation testFixtures(project(':boot'))
+	testImplementation project(':boot'), {
+		capabilities {
+			requireCapability("${project.group}:boot-jupiter")
+		}
+	}
+}
+
+tasks.named 'compileJava', {
+	options.compilerArgs = ['-Amapstruct.verbose=true']
+}

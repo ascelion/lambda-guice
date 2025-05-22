@@ -30,9 +30,7 @@ public class AutoBindClassProvidersModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		final var classes = this.context.getScanned()
-				.getClassesImplementing(Provider.class)
-				.filter(it -> !this.context.containsBean(it));
+		final var classes = this.context.getClassesImplementing(Provider.class);
 
 		for (final var ci : classes) {
 			final Class source = ci.loadClass();

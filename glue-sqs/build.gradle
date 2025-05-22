@@ -1,0 +1,20 @@
+import java.util.function.Consumer
+
+plugins {
+	id 'build.java-library'
+	id 'build.java-lambda-deps'
+}
+
+dependencies {
+	implementation project(':boot')
+
+	api 'software.amazon.awssdk:sqs'
+
+	testImplementation testFixtures(project(':boot'))
+	testImplementation project(':boot'), {
+		capabilities {
+			requireCapability("${project.group}:boot-jupiter")
+		}
+	}
+	testImplementation libs.aws.lambda.tests
+}

@@ -1,6 +1,8 @@
 .*
 !.git?*
-!.sdlc/
+
+!.github
+!.jenkins
 
 *.iml
 *.zst

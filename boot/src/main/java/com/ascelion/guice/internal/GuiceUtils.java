@@ -9,13 +9,17 @@ import com.google.inject.ScopeAnnotation;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import io.github.classgraph.ClassInfo;
 import jakarta.enterprise.inject.Vetoed;
 import jakarta.inject.Qualifier;
+import lombok.NonNull;
 
 public final class GuiceUtils {
+	public static final String GENERATED_OUTPUT_DIRECTORY_PARAM = "generated.output.directory";
+
 	private static final Class<? extends Annotation>[] SINGLETONS = new Class[] {
 			jakarta.inject.Singleton.class,
 			com.google.inject.Singleton.class,
@@ -79,12 +83,31 @@ public final class GuiceUtils {
 	 * When both environment and system property are defined, the environment variable wins.
 	 * </p>
 	 */
-	public static Optional<String> externalConfiguration(String property) {
-		return ofNullable(trimToNull(System.getenv(configurationEnvName(property))))
-				.or(() -> ofNullable(trimToNull(System.getProperty(property))));
+	public static Optional<String> externalConfiguration(String name) {
+		return ofNullable(trimToNull(System.getenv(configurationEnvName(name))))
+				.or(() -> ofNullable(trimToNull(System.getProperty(configurationPropertyName(name)))));
 	}
 
-	public static String configurationEnvName(String property) {
-		return property.toUpperCase().replace('.', '_').replace("-", "");
+	public static String configurationEnvName(@NonNull String name) {
+		return name.toUpperCase().replace('.', '_').replace("-", "");
 	}
+
+	public static String configurationPropertyName(String name) {
+		return name.toLowerCase().replace('_', '.');
+	}
+
+	private static final Pattern CAMEL_CASE = Pattern.compile("([0-9a-z])([A-Z])");
+
+	public static String toKebabCase(String value) {
+		return CAMEL_CASE.matcher(value).replaceAll("$1-$2").toLowerCase();
+	}
+
+	public static Optional<String> tryExternalConfiguration(String name) {
+		if (name.startsWith("{") && name.startsWith("}")) {
+			return externalConfiguration(name.substring(1, name.length() - 2));
+		} else {
+			return Optional.of(name);
+		}
+	}
+
 }

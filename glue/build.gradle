@@ -7,6 +7,7 @@ dependencies {
 	api project(':boot')
 
 	implementation libs.classgraph
+	implementation 'software.amazon.awssdk:regions'
 
 	testImplementation testFixtures(project(':boot'))
 	testImplementation project(':boot'), {
