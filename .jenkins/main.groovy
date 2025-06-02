@@ -1,6 +1,6 @@
 pipeline {
 	agent {
-		label 'agent-jdk17'
+		label 'jdk21'
 	}
 	environment {
 		PATH = "${WORKSPACE}:${PATH}"
